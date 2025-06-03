@@ -113,10 +113,6 @@ body {
   transition: transform 0.3s;
 }
 
-.section-links img:hover {
-  transform: scale(1.1);
-}
-
 /* ===== Sección 3: Texto + Imagen con Enlace ===== */
 .section-text-image {
   display: flex;
@@ -135,10 +131,6 @@ body {
   height: auto;
   border-radius: 5px;
   transition: opacity 0.3s;
-}
-
-.section-text-image img:hover {
-  opacity: 0.7;
 }
 
 /* Responsive */

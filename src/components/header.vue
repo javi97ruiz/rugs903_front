@@ -135,10 +135,6 @@ nav ul li a {
   text-decoration: none;
 }
 
-nav ul li a:hover {
-  text-decoration: underline;
-}
-
 .social-icons {
   margin-left: 0;
 }

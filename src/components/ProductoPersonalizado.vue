@@ -44,33 +44,55 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import placeholder from '@/assets/brand.jpeg'; // Imagen por defecto
+import { ref } from 'vue'
+import placeholder from '@/assets/brand.jpeg'
+import api from '@/api'
+import { uploadImageToCloudinary } from '@/utils/uploadImage'
 
-const imagenPreview = ref(null);
-const altura = ref('');
-const anchura = ref('');
+const imagenPreview = ref(null)
+const imagenFile = ref(null)
+const altura = ref('')
+const anchura = ref('')
 
 function handleImageUpload(event) {
-  const file = event.target.files[0];
+  const file = event.target.files[0]
   if (file && ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-    const reader = new FileReader();
+    imagenFile.value = file
+    const reader = new FileReader()
     reader.onload = (e) => {
-      imagenPreview.value = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      imagenPreview.value = e.target.result
+    }
+    reader.readAsDataURL(file)
   } else {
-    alert('Formato no válido. Usa .jpg, .png o .webp');
+    alert('Formato no válido. Usa .jpg, .png o .webp')
   }
 }
 
-function crearProducto() {
-  console.log('Imagen:', imagenPreview.value);
-  console.log('Altura:', altura.value);
-  console.log('Anchura:', anchura.value);
-  // Aquí podrías hacer un POST al backend más adelante
+async function crearProducto() {
+  if (!imagenFile.value || !altura.value || !anchura.value) {
+    alert('Completa todos los campos y sube una imagen.')
+    return
+  }
+
+  try {
+    const url = await uploadImageToCloudinary(imagenFile.value)
+
+    const response = await api.post('/custom-products', {
+      name: 'Producto Personalizado',
+      height: parseInt(altura.value),
+      length: parseInt(anchura.value),
+      imageUrl: url
+    })
+
+    alert('Producto personalizado creado ✅')
+    console.log(response.data)
+  } catch (err) {
+    console.error(err)
+    alert('Error al crear producto personalizado')
+  }
 }
 </script>
+
 
 <style scoped>
 .producto-detalle-view {

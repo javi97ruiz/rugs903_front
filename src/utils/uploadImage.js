@@ -1,0 +1,14 @@
+// src/utils/uploadImage.js
+import axios from 'axios'
+
+const CLOUD_NAME = 'TU_CLOUD_NAME'
+const UPLOAD_PRESET = 'unsigned_preset_rugs'
+
+export async function uploadImageToCloudinary(file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    formData.append('upload_preset', UPLOAD_PRESET)
+
+    const response = await axios.post(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`, formData)
+    return response.data.secure_url
+}

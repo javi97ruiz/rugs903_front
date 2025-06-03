@@ -11,14 +11,18 @@ a,
 .green {
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
+  transition: none !important;
   padding: 3px;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+a:hover,
+a:focus,
+a:active {
+  text-decoration: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  outline: none !important;
+  background-color: transparent !important;
 }
 
 @media (min-width: 1024px) {

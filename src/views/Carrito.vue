@@ -38,13 +38,18 @@ import { useCarritoStore } from '@/stores/carrito.js';
 import { storeToRefs } from 'pinia';
 import { formatPrecio } from '@/utils/formato.js';
 import api from "@/api.js";
+import { useRouter } from 'vue-router';
+import { loadStripe } from '@stripe/stripe-js';
 
 const carritoStore = useCarritoStore();
 const { items: carrito } = storeToRefs(carritoStore);
-
 const total = computed(() =>
     carrito.value.reduce((suma, item) => suma + item.precio * item.cantidad, 0)
 );
+
+const loading = ref(false);
+const router = useRouter();
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
 function aumentarCantidad(id) {
   carritoStore.incrementarCantidad(id);
@@ -58,18 +63,25 @@ function eliminarProducto(id) {
   carritoStore.eliminarProducto(id);
 }
 
-const loading = ref(false);
-
 async function finalizarCompra() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    await router.push('/login');
+    return;
+  }
+
   loading.value = true;
+
   try {
     const response = await api.post('/payment/checkout', {
       productName: 'Carrito de compra',
       quantity: 1,
-      unitAmount: Math.round(total.value * 100),
+      unitAmount: Math.round(total.value * 100)
     });
 
-    if (response.data?.url) {
+    const stripe = await stripePromise;
+
+    if (response.data?.url && stripe) {
       window.location.href = response.data.url;
     } else {
       alert('Error iniciando el pago: respuesta inválida');
@@ -133,5 +145,10 @@ async function finalizarCompra() {
   border-radius: 6px;
   cursor: pointer;
   font-size: 1rem;
+}
+
+.carrito-total button:disabled {
+  background-color: #a0a0a0;
+  cursor: not-allowed;
 }
 </style>
