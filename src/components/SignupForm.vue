@@ -80,8 +80,8 @@
 
 <script setup>
 import { ref } from 'vue'
-import axios from 'axios'
 import { useRouter } from 'vue-router'
+import api from '@/api.js';
 
 const router = useRouter()
 
@@ -110,10 +110,9 @@ const handleSignup = async () => {
   success.value = false
 
   try {
-    await axios.post('/api/clients', form.value)
+    await api.post('/clients', form.value)  // ← cambiamos de axios a api
     success.value = true
 
-    // Redirigir a login tras unos segundos o automáticamente
     setTimeout(() => {
       router.push('/login')
     }, 1500)
@@ -121,6 +120,7 @@ const handleSignup = async () => {
     error.value = err.response?.data?.message || 'Error al registrar usuario'
   }
 }
+
 </script>
 
 <style scoped>

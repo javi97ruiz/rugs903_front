@@ -2,7 +2,11 @@
   <div class="mis-pedidos">
     <h1>Mis pedidos</h1>
 
-    <div v-if="pedidos.length === 0">
+    <div v-if="loading">
+      <p>Cargando pedidos...</p>
+    </div>
+
+    <div v-else-if="pedidos.length === 0">
       <p>No tienes pedidos registrados.</p>
     </div>
 
@@ -28,41 +32,30 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { formatPrecio } from '@/utils/formato';
+import { ref, onMounted } from 'vue'
+import api from '@/api.js'
+import { formatPrecio } from '@/utils/formato.js'
 
-const pedidos = ref([]);
+const pedidos = ref([])
+const loading = ref(true)
 
-onMounted(() => {
-  // Pedidos simulados
-  pedidos.value = [
-    {
-      id: 1001,
-      fecha: '2024-05-10',
-      total: 45.99,
-      estado: 'pendiente',
-      productos: [
-        { id: 1, nombre: 'Alfombra A', cantidad: 1, precio: 29.99 },
-        { id: 2, nombre: 'Alfombra B', cantidad: 1, precio: 16.00 },
-      ]
-    },
-    {
-      id: 1002,
-      fecha: '2024-04-22',
-      total: 30.50,
-      estado: 'enviado',
-      productos: [
-        { id: 3, nombre: 'Alfombra C', cantidad: 2, precio: 15.25 }
-      ]
-    }
-  ];
-});
+onMounted(async () => {
+  try {
+    const response = await api.get('/pedidos/mis-pedidos')
+    pedidos.value = response.data
+  } catch (error) {
+    console.error('Error al cargar pedidos:', error)
+    alert('No se pudieron cargar los pedidos. Intenta más tarde.')
+  } finally {
+    loading.value = false
+  }
+})
 
 function cancelarPedido(id) {
-  const pedido = pedidos.value.find(p => p.id === id);
+  const pedido = pedidos.value.find(p => p.id === id)
   if (pedido) {
-    pedido.estado = 'cancelado'; // Simulado
-    alert(`Pedido #${id} cancelado ✅`);
+    pedido.estado = 'cancelado' // Simulación, en el futuro deberías llamar a DELETE o PUT
+    alert(`Pedido #${id} cancelado ✅`)
   }
 }
 </script>

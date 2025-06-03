@@ -24,18 +24,20 @@
 
       <div class="carrito-total">
         <h3>Total: {{ formatPrecio(total) }}</h3>
-        <button @click="finalizarCompra">Finalizar compra</button>
+        <button @click="finalizarCompra" :disabled="loading">
+          {{ loading ? 'Procesando...' : 'Finalizar compra' }}
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed, ref } from 'vue';
 import { useCarritoStore } from '@/stores/carrito.js';
 import { storeToRefs } from 'pinia';
 import { formatPrecio } from '@/utils/formato.js';
-import { loadStripe } from '@stripe/stripe-js';
+import api from "@/api.js";
 
 const carritoStore = useCarritoStore();
 const { items: carrito } = storeToRefs(carritoStore);
@@ -56,41 +58,30 @@ function eliminarProducto(id) {
   carritoStore.eliminarProducto(id);
 }
 
+const loading = ref(false);
+
 async function finalizarCompra() {
+  loading.value = true;
+  try {
+    const response = await api.post('/payment/checkout', {
+      productName: 'Carrito de compra',
+      quantity: 1,
+      unitAmount: Math.round(total.value * 100),
+    });
 
-  const stripePromise = loadStripe('pk_test_XXXXXXXXXXXXXXXX'); // tu clave pública
-
-  async function finalizarCompra() {
-    const stripe = await stripePromise;
-
-    const itemsPayload = carrito.value.map(item => ({
-      productName: item.nombre,
-      quantity: item.cantidad,
-      unitAmount: Math.round(item.precio * 100), // a céntimos
-    }));
-
-    try {
-      const response = await fetch('http://localhost:8080/api/payment/checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: itemsPayload })
-      });
-
-      const data = await response.json();
-      if (data.url) {
-        stripe.redirectToCheckout({ url: data.url });
-      } else {
-        alert('Error iniciando el pago');
-      }
-    } catch (error) {
-      console.error('Error al finalizar compra', error);
-      alert('Error de red o de backend');
+    if (response.data?.url) {
+      window.location.href = response.data.url;
+    } else {
+      alert('Error iniciando el pago: respuesta inválida');
     }
+  } catch (error) {
+    console.error('Error al finalizar compra', error);
+    alert('Error de red o del servidor de pago');
+  } finally {
+    loading.value = false;
   }
-
 }
 </script>
-
 
 <style scoped>
 .carrito-container {
@@ -144,4 +135,3 @@ async function finalizarCompra() {
   font-size: 1rem;
 }
 </style>
-
