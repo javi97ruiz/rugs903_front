@@ -24,11 +24,12 @@ api.interceptors.response.use(
             console.warn("Sesión caducada o no autorizada");
             // Aquí podrías redirigir al login o hacer logout automático
         }
+        /*
         if (error.response?.status === 403) {
             localStorage.removeItem('token');
             alert('Por favor inicia sesión')
             window.location.href = '/login';
-        }
+        }*/
         return Promise.reject(error);
     }
 );
