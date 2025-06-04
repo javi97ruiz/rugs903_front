@@ -41,7 +41,7 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const response = await api.get('/pedidos/mis-pedidos')
+    const response = await api.get('/pedidos/me')
     pedidos.value = response.data
   } catch (error) {
     console.error('Error al cargar pedidos:', error)
