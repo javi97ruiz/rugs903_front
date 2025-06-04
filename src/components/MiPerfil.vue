@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import axios from 'axios'
 import { useNotificacionStore } from '@/stores/notificacion'
+import api from "@/api.js"
 
 const user = ref(null)
 const editMode = ref(false)
@@ -13,9 +13,7 @@ const notificacion = useNotificacionStore()
 
 async function fetchUser() {
   try {
-    const res = await axios.get('/users/me', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    })
+    const res = await api.get('/users/me')
     user.value = res.data
     form.value.username = res.data.username
   } catch (e) {
@@ -26,9 +24,7 @@ async function fetchUser() {
 
 async function saveChanges() {
   try {
-    await axios.put('/users/me', form.value, {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    })
+    await api.put('/users/me', form.value)
     editMode.value = false
     await fetchUser()
     notificacion.mostrar('Perfil actualizado ✅', 'success', 3000)
