@@ -40,13 +40,14 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import api from '@/api' // Importa el cliente Axios ya configurado
-
+import api from '@/api'
+import { useAuthStore } from '@/stores/auth' // <-- IMPORTANTE
 
 const username = ref('')
 const password = ref('')
 const error = ref(null)
 const router = useRouter()
+const authStore = useAuthStore() // <-- USO DEL STORE
 
 const handleLogin = async () => {
   error.value = null
@@ -56,14 +57,17 @@ const handleLogin = async () => {
       password: password.value
     })
 
-    // Guarda el token en localStorage o Vuex
-    localStorage.setItem('token', response.data.token)
+    const token = response.data.token
+    const rol = response.data.rol || 'usuario' // Asegúrate que esto viene del backend
 
-    // Redirigir a perfil o dashboard
-    router.push('/perfil')
+    localStorage.setItem('token', token)
+    localStorage.setItem('rol', rol)
+    authStore.login(token, rol) // <-- ACTUALIZA PINIA
+
+    await router.push('/perfil')
 
   } catch (err) {
-    if (err.response && err.response.status === 401) {
+    if (err.response?.status === 401) {
       error.value = 'Credenciales incorrectas'
     } else {
       error.value = 'Error al iniciar sesión'
@@ -71,6 +75,7 @@ const handleLogin = async () => {
   }
 }
 </script>
+
 
 <style scoped>
 .login-form {
