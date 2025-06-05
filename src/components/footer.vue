@@ -33,6 +33,7 @@
 
 <style>
 .footer {
+  position: absolute;
   width: 100vw;
   margin-left: calc(-50vw + 50% ); /* Corrige el desplazamiento lateral */
   background-color: #282828;
