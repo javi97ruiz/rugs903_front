@@ -111,6 +111,11 @@ nav ul {
 
 /* Responsive: En pantallas pequeñas, apilamos los elementos */
 @media (max-width: 768px) {
+
+  .footer{
+    position: sticky;
+  }
+
   nav ul {
     flex-direction: column;
     align-items: center;
