@@ -117,6 +117,9 @@ async function guardarCambios() {
   }
 
   try {
+    // Guardamos el username original para comparar después
+    const usernameOriginal = perfil.value.username
+
     // Actualizar user
     await api.put('/users/me', {
       username: perfil.value.username,
@@ -126,13 +129,24 @@ async function guardarCambios() {
     // Actualizar client
     await api.put('/clients/me', cliente.value)
 
-    notificacion.mostrar('Perfil actualizado ✅', 3000, 'verde')
-    router.push('/perfil')
+    notificacion.mostrar('Perfil actualizado ✅', 2000, 'verde')
+
+    // Si el username ha cambiado, cerramos sesión y redirigimos a login
+    if (usernameOriginal !== perfil.value.username || nuevaPassword.value) {
+      localStorage.removeItem('token')
+      notificacion.mostrar('Vuelve a iniciar sesión ✨', 3000, 'verde')
+      setTimeout(() => {
+        router.push('/login')
+      }, 1000)
+    } else {
+      router.push('/perfil')
+    }
   } catch (err) {
     console.error('Error al guardar cambios:', err)
     notificacion.mostrar('Error al guardar cambios ❌', 3000, 'roja')
   }
 }
+
 </script>
 
 <style scoped>
