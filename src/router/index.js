@@ -37,7 +37,9 @@ const routes = [
     { path: '/perfil/editar', component: () => import('@/components/EditarPerfil.vue') },
 
     { path: '/success', component: () => import ('@/views/SuccessPage.vue') },
-    { path: '/cancel', component: () => import ('@/views/CancelPage.vue') }
+    { path: '/cancel', component: () => import ('@/views/CancelPage.vue') },
+
+    { path: '/admin/custom-products', component: () => import('@/components/ListaCustomProducts.vue') },
 
 ]
 

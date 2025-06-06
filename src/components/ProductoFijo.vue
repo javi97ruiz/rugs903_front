@@ -4,7 +4,7 @@
         :to="modoAdmin ? `/admin/producto/${id}` : (id === 'personalizado' ? '/personalizado' : `/producto/${id}`)"
         class="card-link"
     >
-      <img :src="imagen" :alt="nombre" class="producto-imagen" />
+      <img :src="imagenValida" :alt="nombre" class="producto-imagen" />
       <div class="producto-info">
         <h2 class="producto-nombre">{{ nombre }}</h2>
         <p v-if="descripcion" class="producto-descripcion">{{ descripcion }}</p>
@@ -27,7 +27,8 @@
 import { useCarritoStore } from '@/stores/carrito';
 import { formatPrecio } from '@/utils/formato.js';
 import { useNotificacionStore } from '@/stores/notificacion';
-
+import placeholder from '@/assets/brand.jpeg';
+import { computed } from 'vue';
 
 const notificacion = useNotificacionStore();
 const props = defineProps({
@@ -65,6 +66,12 @@ function addAlCarrito() {
   notificacion.mostrar('Producto añadido al carrito ✅', 'success');
 }
 
+const imagenValida = computed(() => {
+  if (props.imagen && props.imagen.startsWith('http')) {
+    return props.imagen;
+  }
+  return placeholder;
+});
 
 
 </script>

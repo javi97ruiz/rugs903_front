@@ -80,6 +80,9 @@ useClickOutside(dropdownRef, () => {
             <li v-if="auth.rol === 'admin'">
               <router-link to="/admin/pedidos">Lista de pedidos</router-link>
             </li>
+            <li v-if="auth.rol === 'admin'">
+              <router-link to="/admin/custom-products">Lista productos personalizados</router-link>
+            </li>
             <li>
               <button @click="handleLogout" class="logout-btn">Cerrar sesión</button>
             </li>

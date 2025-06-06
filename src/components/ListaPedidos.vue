@@ -2,55 +2,60 @@
   <div class="lista-pedidos">
     <h1>Lista de pedidos</h1>
 
-    <table>
+    <table v-if="pedidos.length > 0">
       <thead>
       <tr>
         <th>ID Pedido</th>
-        <th>Usuario</th>
+        <th>Cliente</th>
+        <th>Producto</th>
         <th>Fecha</th>
         <th>Total</th>
-        <th>Estado</th>
-        <th>Acciones</th>
+        <th>Productos Personalizados</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="pedido in pedidos" :key="pedido.id">
         <td>{{ pedido.id }}</td>
-        <td>{{ pedido.usuario }}</td>
+        <td>{{ pedido.clientName }}</td>
+        <td>{{ pedido.productName }}</td>
         <td>{{ pedido.fecha }}</td>
         <td>{{ formatCurrency(pedido.total) }}</td>
-        <td>{{ pedido.estado }}</td>
         <td>
-          <button @click="verDetalle(pedido.id)">Ver</button>
-          <button @click="marcarEnviado(pedido.id)" :disabled="pedido.estado === 'Enviado'">Marcar enviado</button>
+          <ul v-if="pedido.customProducts.length > 0">
+            <li v-for="custom in pedido.customProducts" :key="custom.id" style="margin-bottom: 8px;">
+              <strong>{{ custom.name }}</strong> <br />
+              <a :href="custom.imageUrl" target="_blank" rel="noopener">
+                <img :src="custom.imageUrl" alt="Imagen personalizada" style="width: 60px; border: 1px solid #aaa; border-radius: 4px;" />
+              </a>
+            </li>
+          </ul>
+          <span v-else>Sin productos personalizados</span>
         </td>
       </tr>
       </tbody>
     </table>
 
-    <div v-if="pedidos.length === 0" class="vacio">
+    <div v-else class="vacio">
       No hay pedidos realizados aún.
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import api from '@/api';
 
-const pedidos = ref([
-  { id: 101, usuario: 'cliente@ejemplo.com', fecha: '2024-04-10', total: 59.99, estado: 'Pendiente' },
-  { id: 102, usuario: 'admin@ejemplo.com', fecha: '2024-04-11', total: 129.90, estado: 'Enviado' },
-  { id: 103, usuario: 'otro@ejemplo.com', fecha: '2024-04-12', total: 35.00, estado: 'Pendiente' }
-]);
+const pedidos = ref([]);
 
-function verDetalle(id) {
-  alert(`Ver detalles del pedido #${id}`);
-}
-
-function marcarEnviado(id) {
-  const pedido = pedidos.value.find(p => p.id === id);
-  if (pedido) pedido.estado = 'Enviado';
-}
+onMounted(async () => {
+  try {
+    const res = await api.get('/pedidos/admin');
+    pedidos.value = res.data;
+  } catch (err) {
+    console.error('Error al cargar pedidos:', err);
+    pedidos.value = [];
+  }
+});
 
 function formatCurrency(value) {
   return value.toLocaleString('es-ES', {
@@ -77,6 +82,7 @@ th, td {
   padding: 12px 15px;
   border: 1px solid #ccc;
   text-align: left;
+  vertical-align: top;
 }
 
 th {
@@ -84,23 +90,14 @@ th {
   font-weight: bold;
 }
 
-button {
-  margin-right: 8px;
-  padding: 6px 12px;
-  border: none;
+img {
+  margin-top: 5px;
   border-radius: 4px;
-  background-color: #28a745;
-  color: white;
-  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-button[disabled] {
-  background-color: #999;
-  cursor: not-allowed;
-}
-
-button:hover:not([disabled]) {
-  background-color: #218838;
+img:hover {
+  transform: scale(1.2);
 }
 
 .vacio {

@@ -14,18 +14,28 @@
       <div v-for="pedido in pedidos" :key="pedido.id" class="pedido-card">
         <h3>Pedido #{{ pedido.id }}</h3>
         <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
+        <p><strong>Producto:</strong> {{ pedido.productName }}</p>
+        <p><strong>Cantidad:</strong> {{ pedido.cantidad }}</p>
         <p><strong>Total:</strong> {{ formatPrecio(pedido.total) }}</p>
-        <p><strong>Estado:</strong> {{ pedido.estado }}</p>
 
-        <ul class="productos">
-          <li v-for="item in pedido.productos" :key="item.id">
-            {{ item.nombre }} (x{{ item.cantidad }}) - {{ formatPrecio(item.precio) }}
-          </li>
-        </ul>
+        <div class="productos-personalizados">
+          <h4>Productos personalizados:</h4>
+          <div v-if="pedido.customProducts.length > 0">
+            <ul>
+              <li v-for="custom in pedido.customProducts" :key="custom.id">
+                {{ custom.name }} - {{ custom.height }}x{{ custom.length }} cm <br />
+                <img :src="custom.imageUrl" alt="Imagen personalizada" style="width: 80px; margin-top: 5px;" />
+              </li>
+            </ul>
+          </div>
+          <p v-else>Sin productos personalizados.</p>
+        </div>
 
+        <!-- Botón cancelación (desactivado porque no hay endpoint de cancelación todavía)
         <button v-if="pedido.estado === 'pendiente'" @click="cancelarPedido(pedido.id)">
           Cancelar pedido
         </button>
+        -->
       </div>
     </div>
   </div>
@@ -41,7 +51,7 @@ const loading = ref(true)
 
 onMounted(async () => {
   try {
-    const response = await api.get('/pedidos/mis-pedidos')
+    const response = await api.get('/pedidos/me')
     pedidos.value = response.data
   } catch (error) {
     console.error('Error al cargar pedidos:', error)
@@ -51,13 +61,24 @@ onMounted(async () => {
   }
 })
 
-function cancelarPedido(id) {
-  const pedido = pedidos.value.find(p => p.id === id)
-  if (pedido) {
-    pedido.estado = 'cancelado' // Simulación, en el futuro deberías llamar a DELETE o PUT
-    alert(`Pedido #${id} cancelado ✅`)
+async function cancelarPedido(id) {
+  if (!confirm(`¿Seguro que deseas cancelar el pedido #${id}?`)) return;
+
+  try {
+    const response = await api.put(`/pedidos/${id}/cancelar`);
+    const pedidoActualizado = response.data;
+
+    // Actualizamos la lista local
+    const pedido = pedidos.value.find(p => p.id === id);
+    if (pedido) pedido.estado = pedidoActualizado.estado;
+
+    alert(`Pedido #${id} cancelado correctamente ✅`);
+  } catch (error) {
+    console.error('Error al cancelar pedido:', error);
+    alert('No se pudo cancelar el pedido. Intenta más tarde.');
   }
 }
+
 </script>
 
 <style scoped>
@@ -75,9 +96,14 @@ function cancelarPedido(id) {
   background: #f9f9f9;
 }
 
-.productos {
-  margin-top: 10px;
-  padding-left: 20px;
+.productos-personalizados {
+  margin-top: 15px;
+}
+
+.productos-personalizados img {
+  display: block;
+  border-radius: 6px;
+  margin-top: 5px;
 }
 
 button {

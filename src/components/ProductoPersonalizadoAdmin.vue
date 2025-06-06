@@ -1,67 +1,42 @@
-<template>
-  <div class="producto-detalle-view">
-    <div class="producto-contenido">
-      <!-- Imagen editable -->
-      <div class="imagen-contenedor">
-        <img :src="imagenPreview || imagen" alt="Imagen personalizada" class="producto-imagen" />
-        <input type="file" accept="image/*" @change="handleImageUpload" />
-      </div>
-
-      <!-- Gestión de opciones -->
-      <div class="producto-info">
-        <h2>Opciones de medidas</h2>
-
-        <div class="gestion-selectores">
-          <div>
-            <label>Alturas máximas:</label>
-            <ul>
-              <li v-for="(altura, index) in alturas" :key="index">
-                {{ altura }}
-                <button @click="eliminarAltura(index)">Eliminar</button>
-              </li>
-            </ul>
-            <input v-model="nuevaAltura" placeholder="Nueva altura" />
-            <button @click="añadirAltura">Añadir altura</button>
-          </div>
-
-          <div>
-            <label>Anchuras máximas:</label>
-            <ul>
-              <li v-for="(anchura, index) in anchuras" :key="index">
-                {{ anchura }}
-                <button @click="eliminarAnchura(index)">Eliminar</button>
-              </li>
-            </ul>
-            <input v-model="nuevaAnchura" placeholder="Nueva anchura" />
-            <button @click="añadirAnchura">Añadir anchura</button>
-          </div>
-        </div>
-
-        <div class="producto-acciones">
-          <button @click="guardarOpciones">Guardar opciones</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script setup>
-import { ref } from 'vue';
-import imagenBrand from '@/assets/brand.jpeg';
+import { ref, computed, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useProductoStore } from '@/stores/productos.js';
+import { useNotificacionStore } from '@/stores/notificacion';
+import api from '@/api';
 
-const imagen = imagenBrand;
+const route = useRoute();
+const router = useRouter();
+const productoStore = useProductoStore();
+const notificacion = useNotificacionStore();
+
+const productoId = route.params.id;
+const productoOriginal = computed(() => productoStore.getProductoById(productoId));
+
+const nombre = ref('');
+const descripcion = ref('');
+const precio = ref(0);
 const imagenPreview = ref(null);
+const imagenFile = ref(null);
+const imagenUrlCloudinary = ref('');
+const error = ref('');
 
-// Opciones actuales
-const alturas = ref(['100 cm', '150 cm']);
-const anchuras = ref(['100 cm', '150 cm']);
-
-// Nuevas opciones
-const nuevaAltura = ref('');
-const nuevaAnchura = ref('');
+// Inicializar campos
+watch(productoOriginal, (producto) => {
+  if (producto) {
+    nombre.value = producto.nombre;
+    descripcion.value = producto.descripcion;
+    precio.value = producto.precio || 0;
+    imagenUrlCloudinary.value = producto.imagen || '';
+  }
+}, { immediate: true });
 
 function handleImageUpload(event) {
   const file = event.target.files[0];
+  if (!file) return;
+
+  imagenFile.value = file;
+
   const reader = new FileReader();
   reader.onload = (e) => {
     imagenPreview.value = e.target.result;
@@ -69,33 +44,73 @@ function handleImageUpload(event) {
   reader.readAsDataURL(file);
 }
 
-function añadirAltura() {
-  if (nuevaAltura.value) {
-    alturas.value.push(nuevaAltura.value);
-    nuevaAltura.value = '';
+async function subirImagen() {
+  if (!imagenFile.value) {
+    alert('Selecciona una imagen primero');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', imagenFile.value);
+
+  try {
+    const response = await api.post('/products/upload-image', formData);
+    imagenUrlCloudinary.value = response.data.url;
+    notificacion.mostrar('Imagen subida correctamente ✅', 'success');
+  } catch (err) {
+    console.error(err);
+    notificacion.mostrar('Error al subir imagen ❌', 'error');
   }
 }
 
-function eliminarAltura(index) {
-  alturas.value.splice(index, 1);
-}
-
-function añadirAnchura() {
-  if (nuevaAnchura.value) {
-    anchuras.value.push(nuevaAnchura.value);
-    nuevaAnchura.value = '';
+function guardarCambios() {
+  if (precio.value <= 0) {
+    error.value = 'El precio debe ser mayor que cero ❌';
+    return;
   }
-}
 
-function eliminarAnchura(index) {
-  anchuras.value.splice(index, 1);
-}
+  error.value = '';
 
-function guardarOpciones() {
-  console.log('Alturas:', alturas.value);
-  console.log('Anchuras:', anchuras.value);
+  productoStore.actualizarProducto(productoId, {
+    nombre: nombre.value,
+    descripcion: descripcion.value,
+    precio: precio.value,
+    imagen: imagenUrlCloudinary.value
+  });
+
+  notificacion.mostrar('Cambios guardados correctamente ✅', 'warning');
+  router.push('/tiendaAdmin');
 }
 </script>
+
+<template>
+  <div class="producto-detalle-view">
+    <div class="producto-contenido">
+      <div class="imagen-contenedor">
+        <img :src="imagenPreview || imagenUrlCloudinary || productoOriginal?.imagen" class="producto-imagen" alt="Preview" />
+        <input type="file" accept="image/*" @change="handleImageUpload" />
+        <button @click="subirImagen">Subir imagen a Cloudinary</button>
+      </div>
+
+      <div class="producto-info">
+        <label>Nombre:</label>
+        <input type="text" v-model="nombre" />
+
+        <label>Descripción:</label>
+        <textarea v-model="descripcion" rows="4"></textarea>
+
+        <label>Precio (€):</label>
+        <input type="number" v-model.number="precio" min="0.01" step="0.01" />
+
+        <div class="producto-acciones">
+          <button @click="guardarCambios">Guardar cambios</button>
+          <p v-if="error" class="mensaje-error">{{ error }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
 
 <style scoped>
 .producto-detalle-view {
