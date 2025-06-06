@@ -1,34 +1,44 @@
 <script setup>
+import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useProductoStore } from '@/stores/productos';
+import api from '@/api';
+import { formatPrecio } from '@/utils/formato';
 import { useCarritoStore } from '@/stores/carrito';
 import { useNotificacionStore } from '@/stores/notificacion';
-import { formatPrecio } from '@/utils/formato';
-import { ref, computed } from 'vue';
 
 const route = useRoute();
-const productoStore = useProductoStore();
+const productoId = route.params.id;
+const producto = ref(null);
+const cantidad = ref(1);
+
 const carrito = useCarritoStore();
 const notificacion = useNotificacionStore();
 
-const cantidad = ref(1);
-const productoId = route.params.id;
-const producto = computed(() => productoStore.getProductoById(productoId));
+onMounted(async () => {
+  try {
+    const response = await api.get(`/products/${productoId}`);
+    producto.value = response.data;
+  } catch (error) {
+    console.error('Error al cargar el producto:', error);
+    producto.value = null;
+  }
+});
 
 function addAlCarrito() {
   if (!producto.value) return;
 
   carrito.agregarProducto({
     id: producto.value.id,
-    nombre: producto.value.name,   // 👈 correcto
+    nombre: producto.value.name,
     imagen: producto.value.imagen,
-    precio: producto.value.price,  // 👈 correcto
+    precio: producto.value.price,
     cantidad: cantidad.value
   });
 
   notificacion.mostrar('Producto añadido al carrito ✅', 'success');
 }
 </script>
+
 
 <template>
   <div class="producto-detalle-view" v-if="producto">
@@ -38,7 +48,8 @@ function addAlCarrito() {
       <div class="producto-info">
         <h1 class="producto-nombre">{{ producto.name }}</h1>
         <p class="producto-descripcion">{{ producto.description }}</p>
-        <p class="producto-precio">Precio: {{ formatPrecio(producto.price) }}</p>
+        <p v-if="producto?.price" class="producto-precio">Precio: {{ formatPrecio(producto.price) }}</p>
+        <p v-else>Precio no disponible</p>
 
         <div class="producto-acciones">
           <label>

@@ -104,7 +104,8 @@ const imagenValida = computed(() => {
 
 .producto-imagen {
   max-width: 100%;
-  height: auto;
+  height: 250px; /* puedes ajustar este valor (200px, 250px, 300px, etc) */
+  object-fit: cover;
   border-radius: 4px;
 }
 
