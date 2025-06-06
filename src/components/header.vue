@@ -68,10 +68,10 @@ useClickOutside(dropdownRef, () => {
           </div>
 
           <ul v-if="mostrarMenu" class="dropdown-menu">
-            <li v-if="auth.rol === 'usuario'">
+            <li v-if="auth.rol === 'user'">
               <router-link to="/perfil">Mi perfil</router-link>
             </li>
-            <li v-if="auth.rol === 'usuario'">
+            <li v-if="auth.rol === 'user'">
               <router-link to="/pedidos">Mis pedidos</router-link>
             </li>
             <li v-if="auth.rol === 'admin'">

@@ -2,9 +2,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || '/',
+    baseURL: import.meta.env.VITE_API_URL || 'https://rugs903-back.onrender.com', // Se ajusta si usas proxy en vite.config.js
 });
-
 
 // Interceptor para incluir el token en cada petición
 api.interceptors.request.use((config) => {
@@ -25,6 +24,12 @@ api.interceptors.response.use(
             console.warn("Sesión caducada o no autorizada");
             // Aquí podrías redirigir al login o hacer logout automático
         }
+        /*
+        if (error.response?.status === 403) {
+            localStorage.removeItem('token');
+            alert('Por favor inicia sesión')
+            window.location.href = '/login';
+        }*/
         return Promise.reject(error);
     }
 );

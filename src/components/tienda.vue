@@ -2,15 +2,16 @@
   <div class="tienda">
     <h1>Tienda</h1>
     <div class="productos-grid">
-      <!-- Productos fijos -->
+      <!-- Productos desde la API -->
+      <!-- Se mostrará imagenBrand hasta que tengas imágenes reales -->
       <ProductoFijo
           v-for="producto in productos"
           :key="producto.id"
           :id="producto.id"
-          :nombre="producto.nombre"
-          :descripcion="producto.descripcion"
+          :nombre="producto.name"
+          :descripcion="producto.description"
+          :precio="producto.price"
           :imagen="producto.imagen"
-          :precio="producto.precio"
       />
 
       <!-- Producto personalizado con mismo estilo -->
@@ -26,12 +27,17 @@
 </template>
 
 <script setup>
-import ProductoFijo from '@/components/ProductoFijo.vue';
-import imagenBrand from '@/assets/brand.jpeg';
-import { useProductoStore } from '@/stores/productos.js';
-const productoStore = useProductoStore();
-const productos = productoStore.productos;
+import { onMounted } from 'vue'
+import ProductoFijo from '@/components/ProductoFijo.vue'
+import imagenBrand from '@/assets/brand.jpeg'
+import { useProductoStore } from '@/stores/productos'
 
+const productoStore = useProductoStore()
+const productos = productoStore.productos
+
+onMounted(() => {
+  productoStore.fetchProductos()
+})
 </script>
 
 <style scoped>
