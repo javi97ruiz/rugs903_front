@@ -20,9 +20,9 @@ function addAlCarrito() {
 
   carrito.agregarProducto({
     id: producto.value.id,
-    nombre: producto.value.nombre,
+    nombre: producto.value.name,   // 👈 correcto
     imagen: producto.value.imagen,
-    precio: producto.value.precio,
+    precio: producto.value.price,  // 👈 correcto
     cantidad: cantidad.value
   });
 
@@ -33,12 +33,12 @@ function addAlCarrito() {
 <template>
   <div class="producto-detalle-view" v-if="producto">
     <div class="producto-contenido">
-      <img :src="producto.imagen" :alt="producto.nombre" class="producto-imagen" />
+      <img :src="producto.imagen" :alt="producto.name" class="producto-imagen" />
 
       <div class="producto-info">
-        <h1 class="producto-nombre">{{ producto.nombre }}</h1>
-        <p class="producto-descripcion">{{ producto.descripcion }}</p>
-        <p class="producto-precio">Precio: {{ formatPrecio(producto.precio) }}</p>
+        <h1 class="producto-nombre">{{ producto.name }}</h1>
+        <p class="producto-descripcion">{{ producto.description }}</p>
+        <p class="producto-precio">Precio: {{ formatPrecio(producto.price) }}</p>
 
         <div class="producto-acciones">
           <label>
