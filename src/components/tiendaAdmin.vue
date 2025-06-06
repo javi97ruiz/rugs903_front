@@ -6,44 +6,68 @@
       <button>Crear nuevo producto</button>
     </router-link>
 
-    <div class="productos-grid">
-      <!-- Productos fijos -->
+    <div class="productos-grid" v-if="productos.length > 0">
       <ProductoFijo
           v-for="producto in productos"
           :key="producto.id"
           :id="producto.id"
-          :nombre="producto.nombre"
-          :descripcion="producto.descripcion"
+          :nombre="producto.name"
+          :descripcion="producto.description"
           :imagen="producto.imagen"
           :modo-admin="true"
-          :precio="producto.precio"
+          :precio="producto.price"
           @editar="editarProducto"
           @borrar="borrarProducto"
       />
+    </div>
 
+    <div v-else>
+      <p>No hay productos registrados.</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { useProductoStore } from '@/stores/productos.js';
+import { ref, onMounted } from 'vue';
 import { useNotificacionStore } from '@/stores/notificacion';
 import { useRouter } from 'vue-router';
 import ProductoFijo from '@/components/ProductoFijo.vue';
+import api from '@/api';
 
-const productoStore = useProductoStore();
 const notificacion = useNotificacionStore();
-const productos = productoStore.productos;
 const router = useRouter();
+
+const productos = ref([]);
+
+async function cargarProductos() {
+  try {
+    const res = await api.get('/products');
+    productos.value = res.data;
+  } catch (err) {
+    console.error('Error al cargar productos:', err);
+    productos.value = [];
+  }
+}
+
+onMounted(() => {
+  cargarProductos();
+});
 
 function editarProducto(id) {
   router.push(`/admin/producto/${id}`);
 }
 
-function borrarProducto(id) {
+async function borrarProducto(id) {
   if (confirm('¿Seguro que deseas eliminar este producto?')) {
-    productoStore.borrarProducto(id);
-    notificacion.mostrar('Producto eliminado ⚠️', 'error');
+    try {
+      await api.delete(`/products/${id}`);
+      notificacion.mostrar('Producto eliminado ⚠️', 'error');
+      // Recargar productos tras borrar
+      await cargarProductos();
+    } catch (err) {
+      console.error('Error al eliminar producto:', err);
+      notificacion.mostrar('Error al eliminar producto ❌', 'error');
+    }
   }
 }
 </script>
@@ -64,5 +88,4 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
-
 </style>

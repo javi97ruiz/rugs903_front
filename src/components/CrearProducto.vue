@@ -1,17 +1,17 @@
 <script setup>
 import { ref } from 'vue';
-import { useProductoStore } from '@/stores/productos';
 import { useRouter } from 'vue-router';
 import { useNotificacionStore } from '@/stores/notificacion';
+import api from '@/api';
+import { uploadImageToCloudinary } from '@/utils/uploadImage'; // usamos tu util
 
-const productoStore = useProductoStore();
 const notificacion = useNotificacionStore();
 const router = useRouter();
 
 const nombre = ref('');
 const descripcion = ref('');
 const precio = ref(0);
-const imagen = ref(null);
+const imagenFile = ref(null);
 const preview = ref(null);
 const error = ref('');
 
@@ -25,17 +25,18 @@ function handleImagen(event) {
     return;
   }
 
+  imagenFile.value = file;
+
   const reader = new FileReader();
   reader.onload = e => {
     preview.value = e.target.result;
-    imagen.value = e.target.result;
     error.value = '';
   };
   reader.readAsDataURL(file);
 }
 
-function crearProducto() {
-  if (!nombre.value || !descripcion.value || !imagen.value) {
+async function crearProducto() {
+  if (!nombre.value || !descripcion.value || !imagenFile.value) {
     error.value = 'Todos los campos son obligatorios ❌';
     return;
   }
@@ -45,20 +46,29 @@ function crearProducto() {
     return;
   }
 
-  error.value = '';
-  const nuevoProducto = {
-    id: Date.now(),
-    nombre: nombre.value,
-    descripcion: descripcion.value,
-    precio: precio.value,
-    imagen: imagen.value
-  };
+  try {
+    error.value = '';
 
-  productoStore.addProducto(nuevoProducto);
+    // 👉 Subir imagen a Cloudinary
+    const imageUrl = await uploadImageToCloudinary(imagenFile.value);
 
-  notificacion.mostrar('Producto creado correctamente ✅', 'success');
+    // 👉 Hacer POST al backend
+    await api.post('/products', {
+      name: nombre.value,
+      description: descripcion.value,
+      price: precio.value,
+      quantity: 1, // o lo que quieras por defecto
+      imagen: imageUrl
+    });
 
-  router.push('/tiendaAdmin');
+    notificacion.mostrar('Producto creado correctamente ✅', 'success');
+
+    router.push('/tiendaAdmin');
+
+  } catch (err) {
+    console.error('Error al crear producto:', err);
+    error.value = 'Error al crear producto. Intenta más tarde.';
+  }
 }
 </script>
 
