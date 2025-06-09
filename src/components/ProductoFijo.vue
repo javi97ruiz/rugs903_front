@@ -67,11 +67,16 @@ function addAlCarrito() {
 }
 
 const imagenValida = computed(() => {
-  if (props.imagen && props.imagen.startsWith('http')) {
+  if (props.imagen && (
+      props.imagen.startsWith('http') ||
+      props.imagen.startsWith('/') ||
+      props.imagen.startsWith('data:image')
+  )) {
     return props.imagen;
   }
   return placeholder;
 });
+
 
 
 </script>
