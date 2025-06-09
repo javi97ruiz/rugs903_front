@@ -12,8 +12,10 @@
       </div>
     </router-link>
     <div v-if="!modoAdmin" class="boton-comprar">
-      <button @click="addAlCarrito">Añadir al carrito</button>
+      <button v-if="id === 'personalizado'" @click="irACrearProducto">Crear producto</button>
+      <button v-else @click="addAlCarrito">Añadir al carrito</button>
     </div>
+
 
     <!-- Botones admin si aplica -->
     <div v-if="modoAdmin" class="admin-buttons">
@@ -29,7 +31,12 @@ import { formatPrecio } from '@/utils/formato.js';
 import { useNotificacionStore } from '@/stores/notificacion';
 import placeholder from '@/assets/brand.jpeg';
 import { computed } from 'vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 
+function irACrearProducto() {
+  router.push('/personalizado');
+}
 const notificacion = useNotificacionStore();
 const props = defineProps({
   id: [Number, String],

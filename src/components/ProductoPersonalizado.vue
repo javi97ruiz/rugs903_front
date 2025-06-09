@@ -56,16 +56,40 @@ async function crearProducto() {
       name: 'Producto Personalizado',
       height: parseInt(altura.value),
       length: parseInt(anchura.value),
+      price: precioCalculado.value, // << AÑADIDO
       imageUrl: imagenUrlCloudinary.value
     });
 
     notificacion.mostrar('Producto personalizado creado ✅', 3000, 'verde');
     console.log(response.data);
+
+    // Opcional → redirigir a la tienda
+    router.push('/tienda');
   } catch (err) {
     console.error(err);
     notificacion.mostrar('Error al crear producto personalizado ❌', 3000, 'roja');
   }
 }
+
+
+const precioCalculado = computed(() => {
+  const alto = parseInt(altura.value);
+  const ancho = parseInt(anchura.value);
+
+  if (!alto || !ancho) return 0;
+
+  // Ejemplo de fórmula simple que puedes ajustar:
+  // Precio base 100€, + 2€ por cm cuadrado extra sobre 50x50
+  const basePrecio = 100;
+  const area = alto * ancho;
+  const baseArea = 50 * 50;
+  const extraPrecioPorCm2 = 0.02; // 2 céntimos por cm2 extra
+
+  const extra = Math.max(0, area - baseArea) * extraPrecioPorCm2;
+
+  return Math.round(basePrecio + extra);
+});
+
 </script>
 
 <template>
@@ -74,7 +98,6 @@ async function crearProducto() {
       <div class="imagen-contenedor">
         <img :src="imagenPreview || placeholder" alt="Imagen personalizada" class="producto-imagen" />
         <input type="file" accept=".jpg,.png,.webp" @change="handleImageUpload" />
-        <button @click="subirImagen">Subir imagen a Cloudinary</button>
       </div>
 
       <div class="producto-info">
@@ -103,6 +126,7 @@ async function crearProducto() {
             </select>
           </div>
         </div>
+        <p class="producto-precio">Precio calculado: {{ precioCalculado }} €</p>
 
         <div class="producto-acciones">
           <button @click="crearProducto">Crear producto</button>
