@@ -3,7 +3,6 @@ import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useNotificacionStore } from '@/stores/notificacion';
 import api from '@/api';
-import { uploadImageToCloudinary } from '@/utils/uploadImage'; // usamos tu util
 
 const notificacion = useNotificacionStore();
 const router = useRouter();
@@ -49,16 +48,13 @@ async function crearProducto() {
   try {
     error.value = '';
 
-    // 👉 Subir imagen a Cloudinary
-    const imageUrl = await uploadImageToCloudinary(imagenFile.value);
-
     // 👉 Hacer POST al backend
     await api.post('/products', {
       name: nombre.value,
       description: descripcion.value,
       price: precio.value,
       quantity: 1, // o lo que quieras por defecto
-      imagen: imageUrl
+      imagen: preview.value
     });
 
     notificacion.mostrar('Producto creado correctamente ✅', 'success');
