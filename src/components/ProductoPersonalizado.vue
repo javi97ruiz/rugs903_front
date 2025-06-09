@@ -10,7 +10,6 @@ const imagenPreview = ref(null);
 const imagenFile = ref(null);
 const altura = ref('');
 const anchura = ref('');
-const imagenUrlCloudinary = ref('');
 
 function handleImageUpload(event) {
   const file = event.target.files[0];
@@ -26,50 +25,10 @@ function handleImageUpload(event) {
   }
 }
 
-async function subirImagen() {
-  if (!imagenFile.value) {
-    alert('Primero sube una imagen');
-    return;
-  }
-
-  const formData = new FormData();
-  formData.append('file', imagenFile.value);
-
-  try {
-    const response = await api.post('/products/upload-image', formData);
-    imagenUrlCloudinary.value = response.data.url;
-    notificacion.mostrar('Imagen subida correctamente ✅', 3000, 'verde');
-  } catch (err) {
-    console.error(err);
-    notificacion.mostrar('Error al subir la imagen ❌', 3000, 'roja');
-  }
-}
-
 async function crearProducto() {
-  // Si la imagen aún no se subió, súbela primero
-  if (!imagenUrlCloudinary.value) {
-    if (!imagenFile.value) {
-      alert('Selecciona una imagen primero.');
-      return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', imagenFile.value);
-
-    try {
-      const response = await api.post('/products/upload-image', formData);
-      imagenUrlCloudinary.value = response.data.url;
-      notificacion.mostrar('Imagen subida correctamente ✅', 3000, 'verde');
-    } catch (err) {
-      console.error(err);
-      notificacion.mostrar('Error al subir la imagen ❌', 3000, 'roja');
-      return;
-    }
-  }
-
-  // Ahora validamos medidas
-  if (!altura.value || !anchura.value) {
-    alert('Selecciona altura y anchura.');
+  // Validar imagen, altura y anchura
+  if (!imagenPreview.value || !altura.value || !anchura.value) {
+    alert('Completa todos los campos y sube una imagen.');
     return;
   }
 
@@ -79,7 +38,7 @@ async function crearProducto() {
       height: parseInt(altura.value),
       length: parseInt(anchura.value),
       price: precioCalculado.value,
-      imageUrl: imagenUrlCloudinary.value
+      imageUrl: imagenPreview.value // aquí usamos directamente el base64
     });
 
     notificacion.mostrar('Producto personalizado creado ✅', 3000, 'verde');
@@ -92,8 +51,6 @@ async function crearProducto() {
     notificacion.mostrar('Error al crear producto personalizado ❌', 3000, 'roja');
   }
 }
-
-
 
 const precioCalculado = computed(() => {
   const alto = parseInt(altura.value);
