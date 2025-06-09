@@ -3,8 +3,10 @@ import {computed, ref} from 'vue';
 import placeholder from '@/assets/brand.jpeg';
 import api from '@/api';
 import { useNotificacionStore } from '@/stores/notificacion';
+import { useCarritoStore } from '@/stores/carrito'
 
 const notificacion = useNotificacionStore();
+const carrito = useCarritoStore()
 
 const imagenPreview = ref(null);
 const imagenFile = ref(null);
@@ -29,10 +31,9 @@ function handleImageUpload(event) {
 }
 
 async function crearProducto() {
-  // Validar imagen, altura y anchura
   if (!imagenPreview.value || !altura.value || !anchura.value) {
-    alert('Completa todos los campos y sube una imagen.');
-    return;
+    alert('Completa todos los campos y sube una imagen.')
+    return
   }
 
   try {
@@ -41,17 +42,26 @@ async function crearProducto() {
       height: parseInt(altura.value),
       length: parseInt(anchura.value),
       price: precioCalculado.value,
-      imageUrl: imagenPreview.value // aquí usamos directamente el base64
-    });
+      imageUrl: imagenPreview.value
+    })
 
-    notificacion.mostrar('Producto personalizado creado ✅', 3000, 'verde');
-    console.log(response.data);
+    notificacion.mostrar('Producto personalizado creado ✅', 3000, 'verde')
+    console.log(response.data)
 
-    // Opcional → redirigir a la tienda
-    router.push('/tienda');
+    // ✅ Añadir al carrito
+    carrito.agregarProducto({
+      id: `custom-${Date.now()}`, // un id único temporal
+      nombre: 'Producto Personalizado',
+      imagen: imagenPreview.value,
+      precio: precioCalculado.value,
+      cantidad: 1
+    })
+
+    // Redirigir a tienda
+    router.push('/tienda')
   } catch (err) {
-    console.error(err);
-    notificacion.mostrar('Error al crear producto personalizado ❌', 3000, 'roja');
+    console.error(err)
+    notificacion.mostrar('Error al crear producto personalizado ❌', 3000, 'roja')
   }
 }
 
