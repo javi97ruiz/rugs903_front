@@ -46,8 +46,30 @@ async function subirImagen() {
 }
 
 async function crearProducto() {
-  if (!imagenUrlCloudinary.value || !altura.value || !anchura.value) {
-    alert('Completa todos los campos y sube una imagen.');
+  // Si la imagen aún no se subió, súbela primero
+  if (!imagenUrlCloudinary.value) {
+    if (!imagenFile.value) {
+      alert('Selecciona una imagen primero.');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', imagenFile.value);
+
+    try {
+      const response = await api.post('/products/upload-image', formData);
+      imagenUrlCloudinary.value = response.data.url;
+      notificacion.mostrar('Imagen subida correctamente ✅', 3000, 'verde');
+    } catch (err) {
+      console.error(err);
+      notificacion.mostrar('Error al subir la imagen ❌', 3000, 'roja');
+      return;
+    }
+  }
+
+  // Ahora validamos medidas
+  if (!altura.value || !anchura.value) {
+    alert('Selecciona altura y anchura.');
     return;
   }
 
@@ -56,7 +78,7 @@ async function crearProducto() {
       name: 'Producto Personalizado',
       height: parseInt(altura.value),
       length: parseInt(anchura.value),
-      price: precioCalculado.value, // << AÑADIDO
+      price: precioCalculado.value,
       imageUrl: imagenUrlCloudinary.value
     });
 
@@ -70,6 +92,7 @@ async function crearProducto() {
     notificacion.mostrar('Error al crear producto personalizado ❌', 3000, 'roja');
   }
 }
+
 
 
 const precioCalculado = computed(() => {
