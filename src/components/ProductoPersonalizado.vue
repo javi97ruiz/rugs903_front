@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import {computed, ref} from 'vue';
 import placeholder from '@/assets/brand.jpeg';
 import api from '@/api';
 import { useNotificacionStore } from '@/stores/notificacion';
