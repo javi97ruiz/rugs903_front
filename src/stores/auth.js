@@ -1,6 +1,8 @@
 // stores/auth.js
 import { defineStore } from 'pinia'
 import api from '@/api'
+import { useCarritoStore } from '@/stores/carrito';
+
 
 export const useAuthStore = defineStore('auth', {
     state: () => ({
@@ -17,6 +19,8 @@ export const useAuthStore = defineStore('auth', {
                 try {
                     const response = await api.get('/users/me') // esto validará el token
                     this.user = response.data
+                    const carritoStore = useCarritoStore();
+                    carritoStore.setUserId(this.user.id);
                     this.isLoggedIn = true
                     this.rol = rol
                 } catch (e) {
@@ -36,6 +40,8 @@ export const useAuthStore = defineStore('auth', {
         logout() {
             localStorage.removeItem('token')
             localStorage.removeItem('rol')
+            const carritoStore = useCarritoStore();
+            carritoStore.vaciarCarrito();
             this.isLoggedIn = false
             this.rol = null
             this.user = null
