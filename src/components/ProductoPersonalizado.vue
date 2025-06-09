@@ -10,6 +10,9 @@ const imagenPreview = ref(null);
 const imagenFile = ref(null);
 const altura = ref('');
 const anchura = ref('');
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 function handleImageUpload(event) {
   const file = event.target.files[0];
