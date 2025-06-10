@@ -64,7 +64,7 @@ const handleLogin = async () => {
     localStorage.setItem('rol', rol)
     authStore.login(token, rol) // <-- ACTUALIZA PINIA
 
-    await router.push('/perfil')
+    await router.push('/')
 
   } catch (err) {
     if (err.response?.status === 401) {

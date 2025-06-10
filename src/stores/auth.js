@@ -30,12 +30,19 @@ export const useAuthStore = defineStore('auth', {
             }
         },
 
-        login(token, rol) {
+        async login(token, rol) {
             localStorage.setItem('token', token)
             localStorage.setItem('rol', rol)
             this.isLoggedIn = true
             this.rol = rol
-        },
+
+            const response = await api.get('/users/me')
+            this.user = response.data
+
+            const carritoStore = useCarritoStore();
+            carritoStore.setUserId(this.user.id);
+        }
+        ,
 
         logout() {
             localStorage.removeItem('token')

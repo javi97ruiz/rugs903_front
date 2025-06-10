@@ -87,6 +87,9 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import api from '@/api'
 import { useNotificacionStore } from '@/stores/notificacion'
+import { useAuthStore } from '@/stores/auth'
+
+const auth = useAuthStore()
 
 const router = useRouter()
 const notificacion = useNotificacionStore()
@@ -117,7 +120,6 @@ async function guardarCambios() {
   }
 
   try {
-    // Guardamos el username original para comparar después
     const usernameOriginal = perfil.value.username
 
     // Actualizar user
@@ -131,12 +133,11 @@ async function guardarCambios() {
 
     notificacion.mostrar('Perfil actualizado ✅', 2000, 'verde')
 
-    // Si el username ha cambiado, cerramos sesión y redirigimos a login
+    // Si el username o la password han cambiado, logout automático
     if (usernameOriginal !== perfil.value.username || nuevaPassword.value) {
-      localStorage.removeItem('token')
       notificacion.mostrar('Vuelve a iniciar sesión ✨', 3000, 'verde')
       setTimeout(() => {
-        router.push('/login')
+        auth.logoutAndRedirect()
       }, 1000)
     } else {
       router.push('/perfil')
