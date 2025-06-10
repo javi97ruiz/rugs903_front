@@ -40,7 +40,9 @@ import { formatPrecio } from '@/utils/formato.js';
 import api from "@/api.js";
 import { useRouter } from 'vue-router';
 import { loadStripe } from '@stripe/stripe-js';
+import { useAuthStore } from '@/stores/auth'
 
+const auth = useAuthStore()
 const carritoStore = useCarritoStore();
 const { items: carrito } = storeToRefs(carritoStore);
 const total = computed(() =>
