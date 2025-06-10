@@ -2,7 +2,7 @@
   <div class="success-container">
     <h1>¡Gracias por tu compra!</h1>
     <p>Tu pedido ha sido procesado correctamente.</p>
-    <router-link to="/tienda" class="btn">Volver a la tienda</router-link>
+    <router-link to="/" class="btn">Volver al inicio</router-link>
   </div>
 </template>
 

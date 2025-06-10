@@ -79,8 +79,15 @@ async function finalizarCompra() {
       unitAmount: Math.round(item.precio * 100) // en céntimos
     }));
 
-    const response = await api.post('/payment/checkout', { items });
-
+    const response = await api.post('/payment/checkout', {
+      items,
+      userId: auth.user.id,
+      productos: JSON.stringify(carrito.value.map(item => ({
+        id: item.id,
+        cantidad: item.cantidad,
+        precio: item.precio
+      })))
+    });
     const stripe = await stripePromise;
 
     if (response.data?.url && stripe) {
