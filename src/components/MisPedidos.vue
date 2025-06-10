@@ -24,6 +24,8 @@
             Total: {{ formatPrecio(linea.total) }}
           </li>
         </ul>
+        <p><strong>Total del pedido:</strong> {{ formatPrecio(pedido.totalPedido) }}</p>
+
       </div>
       <p v-else>Sin líneas de pedido.</p>
 
