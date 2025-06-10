@@ -14,9 +14,15 @@
       <div v-for="pedido in pedidos" :key="pedido.id" class="pedido-card">
         <h3>Pedido #{{ pedido.id }}</h3>
         <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
-        <p><strong>Producto:</strong> {{ pedido.productName }}</p>
-        <p><strong>Cantidad:</strong> {{ pedido.cantidad }}</p>
-        <p><strong>Total:</strong> {{ formatPrecio(pedido.total) }}</p>
+        <p><strong>Cliente:</strong> {{ pedido.clientName }}</p>
+        <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+
+        <h4>Productos:</h4>
+        <ul>
+          <li v-for="linea in pedido.lineas" :key="linea.productId">
+            {{ linea.productName }} - Cantidad: {{ linea.cantidad }} - Total: {{ formatPrecio(linea.total) }}
+          </li>
+        </ul>
 
         <div class="productos-personalizados">
           <h4>Productos personalizados:</h4>
@@ -38,6 +44,7 @@
         -->
       </div>
     </div>
+
   </div>
 </template>
 
