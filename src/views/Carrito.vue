@@ -73,11 +73,13 @@ async function finalizarCompra() {
   loading.value = true;
 
   try {
-    const response = await api.post('/payment/checkout', {
-      productName: 'Carrito de compra',
-      quantity: 1,
-      unitAmount: Math.round(total.value * 100)
-    });
+    const items = carrito.value.map(item => ({
+      productName: item.nombre,
+      quantity: item.cantidad,
+      unitAmount: Math.round(item.precio * 100) // en céntimos
+    }));
+
+    const response = await api.post('/payment/checkout', { items });
 
     const stripe = await stripePromise;
 
@@ -93,6 +95,7 @@ async function finalizarCompra() {
     loading.value = false;
   }
 }
+
 </script>
 
 <style scoped>
