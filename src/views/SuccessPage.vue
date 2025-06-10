@@ -6,6 +6,17 @@
   </div>
 </template>
 
+<script setup>
+import { useCarritoStore } from '@/stores/carrito';
+import { onMounted } from 'vue';
+
+const carrito = useCarritoStore();
+
+onMounted(() => {
+  carrito.vaciarCarrito();
+});
+</script>
+
 <style scoped>
 .success-container {
   text-align: center;
@@ -19,5 +30,13 @@
   text-decoration: none;
   border-radius: 6px;
   display: inline-block;
+  transition: background-color 0.2s ease, color 0.2s ease; /* para suavizar */
 }
+
+.btn:hover {
+  background-color: #218838; /* un verde un poco más oscuro */
+  color: white;
+  text-decoration: none; /* para que no se subraye */
+}
+
 </style>
