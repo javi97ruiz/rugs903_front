@@ -50,7 +50,7 @@ async function crearProducto() {
 
     // ✅ Añadir al carrito
     carrito.agregarProducto({
-      id: `custom-${Date.now()}`, // un id único temporal
+      id: `custom-${response.data.id}`, // un id único temporal
       nombre: 'Producto Personalizado',
       imagen: imagenPreview.value,
       precio: precioCalculado.value,
