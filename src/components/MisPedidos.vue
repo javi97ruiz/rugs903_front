@@ -10,33 +10,34 @@
       <p>No tienes pedidos registrados.</p>
     </div>
 
-    <div v-else class="lista-pedidos">
-      <div v-for="pedido in pedidos" :key="pedido.id" class="pedido-card">
-        <h3>Pedido #{{ pedido.id }}</h3>
-        <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
-        <p><strong>Cliente:</strong> {{ pedido.clientName }}</p>
-        <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+    <div v-for="pedido in pedidos" :key="pedido.id" class="pedido-card">
+      <h3>Pedido #{{ pedido.id }}</h3>
+      <p><strong>Fecha:</strong> {{ pedido.fecha }}</p>
 
-        <h4>Productos:</h4>
+      <div v-if="pedido.lineas.length > 0">
+        <h4>Líneas de pedido:</h4>
         <ul>
           <li v-for="linea in pedido.lineas" :key="linea.productId">
-            {{ linea.productName }} - Cantidad: {{ linea.cantidad }} - Total: {{ formatPrecio(linea.total) }}
+            Producto: {{ linea.productName }} <br />
+            Cantidad: {{ linea.cantidad }} <br />
+            Precio unitario: {{ formatPrecio(linea.precioUnitario) }} <br />
+            Total: {{ formatPrecio(linea.total) }}
           </li>
         </ul>
+      </div>
+      <p v-else>Sin líneas de pedido.</p>
 
-        <div class="productos-personalizados">
-          <h4>Productos personalizados:</h4>
-          <div v-if="pedido.customProducts.length > 0">
-            <ul>
-              <li v-for="custom in pedido.customProducts" :key="custom.id">
-                {{ custom.name }} - {{ custom.height }}x{{ custom.length }} cm <br />
-                <img :src="custom.imageUrl" alt="Imagen personalizada" style="width: 80px; margin-top: 5px;" />
-              </li>
-            </ul>
-          </div>
-          <p v-else>Sin productos personalizados.</p>
+      <div class="productos-personalizados">
+        <h4>Productos personalizados:</h4>
+        <div v-if="pedido.customProducts.length > 0">
+          <ul>
+            <li v-for="custom in pedido.customProducts" :key="custom.id">
+              {{ custom.name }} - {{ custom.height }}x{{ custom.length }} cm <br />
+              <img :src="custom.imageUrl" alt="Imagen personalizada" style="width: 80px; margin-top: 5px;" />
+            </li>
+          </ul>
         </div>
-
+        <p v-else>Sin productos personalizados.</p>
         <!-- Botón cancelación (desactivado porque no hay endpoint de cancelación todavía)
         <button v-if="pedido.estado === 'pendiente'" @click="cancelarPedido(pedido.id)">
           Cancelar pedido
@@ -44,6 +45,7 @@
         -->
       </div>
     </div>
+
 
   </div>
 </template>
