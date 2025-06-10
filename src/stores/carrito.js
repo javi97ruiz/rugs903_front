@@ -1,4 +1,3 @@
-// stores/carrito.js
 import { defineStore } from 'pinia';
 
 export const useCarritoStore = defineStore('carrito', {
@@ -10,7 +9,6 @@ export const useCarritoStore = defineStore('carrito', {
     getters: {
         total: (state) =>
             state.items.reduce((suma, item) => suma + item.precio * item.cantidad, 0),
-
         cantidadTotal: (state) =>
             state.items.reduce((total, item) => total + item.cantidad, 0)
     },
@@ -38,6 +36,14 @@ export const useCarritoStore = defineStore('carrito', {
             this.guardarCarrito();
         },
 
+        cambiarCantidad(id, cantidad) {
+            const producto = this.items.find((p) => p.id === id);
+            if (producto && cantidad > 0) {
+                producto.cantidad = cantidad;
+                this.guardarCarrito();
+            }
+        },
+
         incrementarCantidad(id) {
             const producto = this.items.find((p) => p.id === id);
             if (producto) {
@@ -60,10 +66,8 @@ export const useCarritoStore = defineStore('carrito', {
         },
 
         vaciarCarrito() {
-            this.items = [];
-            if (this.userId) {
-                localStorage.removeItem(`carrito_${this.userId}`);
-            }
+            this.items = []; // Se vacía visualmente
+            // No se borra del localStorage para que se recupere en el próximo login
         }
     }
 });
