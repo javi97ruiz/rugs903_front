@@ -7,22 +7,33 @@
 </template>
 
 <script setup>
+import { useAuthStore } from '@/stores/auth';
 import { useCarritoStore } from '@/stores/carrito';
-import { onMounted } from 'vue';
-import { useAuthStore } from '@/stores/auth'
+import { onMounted, watch } from 'vue';
 
-const auth = useAuthStore()
-
+const auth = useAuthStore();
 const carrito = useCarritoStore();
 
 onMounted(() => {
   console.log('🟢 Success mounted');
-  console.log('Auth userId:', auth.user?.id);
-  console.log('Carrito userId antes de vaciar:', carrito.userId);
-  carrito.vaciarCarrito();
-  console.log('Carrito después de vaciar:', carrito.items);
-});
 
+  watch(
+      () => auth.user?.id,
+      (newUserId) => {
+        console.log('🔍 Watching auth.user.id →', newUserId);
+
+        if (newUserId) {
+          console.log('✅ auth.user.id disponible:', newUserId);
+          carrito.setUserId(newUserId);
+          carrito.vaciarCarrito();
+          console.log('🛒 Carrito vaciado correctamente');
+        } else {
+          console.warn('⚠️ auth.user.id aún no disponible');
+        }
+      },
+      { immediate: true } // Ejecuta el watch inmediatamente con el valor actual
+  );
+});
 </script>
 
 <style scoped>
@@ -30,6 +41,7 @@ onMounted(() => {
   text-align: center;
   padding: 60px;
 }
+
 .btn {
   margin-top: 20px;
   background-color: #28a745;
@@ -38,13 +50,12 @@ onMounted(() => {
   text-decoration: none;
   border-radius: 6px;
   display: inline-block;
-  transition: background-color 0.2s ease, color 0.2s ease; /* para suavizar */
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .btn:hover {
-  background-color: #218838; /* un verde un poco más oscuro */
+  background-color: #218838;
   color: white;
-  text-decoration: none; /* para que no se subraye */
+  text-decoration: none;
 }
-
 </style>
