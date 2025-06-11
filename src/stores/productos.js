@@ -21,10 +21,18 @@ export const useProductoStore = defineStore('producto', {
             return this.productos.find(p => p.id == id)
         },
 
-        actualizarProducto(id, data) {
-            const index = this.productos.findIndex(p => p.id == id)
-            if (index !== -1) {
-                this.productos[index] = { ...this.productos[index], ...data }
+        async actualizarProducto(id, data) {
+            try {
+                const response = await api.put(`/products/${id}`, data)
+                const updatedProduct = response.data
+
+                // Actualizamos en la store local
+                const index = this.productos.findIndex(p => p.id == id)
+                if (index !== -1) {
+                    this.productos[index] = updatedProduct
+                }
+            } catch (error) {
+                console.error('Error al actualizar producto:', error)
             }
         },
 
@@ -35,5 +43,23 @@ export const useProductoStore = defineStore('producto', {
         addProducto(nuevoProducto) {
             this.productos.push(nuevoProducto)
         }
+    },
+
+    async fetchProductoById(id) {
+        try {
+            const response = await api.get(`/products/${id}`)
+            const producto = response.data
+
+            // Añadir o reemplazar en la lista productos
+            const index = this.productos.findIndex(p => p.id == id)
+            if (index !== -1) {
+                this.productos[index] = producto
+            } else {
+                this.productos.push(producto)
+            }
+        } catch (error) {
+            console.error('Error al obtener producto:', error)
+        }
     }
+
 })

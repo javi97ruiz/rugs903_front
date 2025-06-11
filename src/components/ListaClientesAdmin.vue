@@ -71,7 +71,7 @@
         <label>Rol
           <select v-model="usuarioForm.rol">
             <option value="admin">Admin</option>
-            <option value="usuario">Usuario</option>
+            <option value="user">Usuario</option>
           </select>
         </label>
         <label>Password (opcional) <input v-model="usuarioForm.password" type="password" /></label>

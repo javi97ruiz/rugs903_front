@@ -33,9 +33,9 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useProductoStore } from '@/stores/productos.js';
+import { useProductoStore } from '@/stores/producto.js';
 import { useNotificacionStore } from '@/stores/notificacion';
 
 const route = useRoute();
@@ -52,12 +52,15 @@ const precio = ref(0);
 const imagenPreview = ref(null);
 const error = ref('');
 
-// Inicializar campos cuando se cargue el producto
+onMounted(async () => {
+  await productoStore.fetchProductoById(productoId);
+});
+
 watch(productoOriginal, (producto) => {
   if (producto) {
-    nombre.value = producto.nombre;
-    descripcion.value = producto.descripcion;
-    precio.value = producto.precio || 0;
+    nombre.value = producto.name;  // Backend usa "name"
+    descripcion.value = producto.description;
+    precio.value = producto.price;
   }
 }, { immediate: true });
 
@@ -72,18 +75,19 @@ function handleImageUpload(event) {
   reader.readAsDataURL(file);
 }
 
-function guardarCambios() {
-  if (precio.value <= 0) {
-    error.value = 'El precio debe ser mayor que cero ❌';
+async function guardarCambios() {
+  if (!nombre.value || !descripcion.value || precio.value <= 0) {
+    error.value = 'Todos los campos son obligatorios y el precio debe ser mayor que cero ❌';
     return;
   }
 
   error.value = '';
 
-  productoStore.actualizarProducto(productoId, {
-    nombre: nombre.value,
-    descripcion: descripcion.value,
-    precio: precio.value,
+  await productoStore.actualizarProducto(productoId, {
+    name: nombre.value,
+    description: descripcion.value,
+    price: precio.value,
+    quantity: productoOriginal.value.quantity, // No se edita aquí pero es obligatorio en el DTO
     imagen: imagenPreview.value || productoOriginal.value.imagen,
   });
 
@@ -92,6 +96,7 @@ function guardarCambios() {
   router.push('/tiendaAdmin');
 }
 </script>
+
 
 <style scoped>
 .producto-detalle-view {
