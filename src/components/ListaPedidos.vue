@@ -7,19 +7,26 @@
       <tr>
         <th>ID Pedido</th>
         <th>Cliente</th>
-        <th>Producto</th>
+        <th>Productos</th>
         <th>Fecha</th>
-        <th>Total</th>
+        <th>Estado</th>
         <th>Productos Personalizados</th>
+        <th>Total</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="pedido in pedidos" :key="pedido.id">
         <td>{{ pedido.id }}</td>
         <td>{{ pedido.clientName }}</td>
-        <td>{{ pedido.productName }}</td>
+        <td>
+          <ul>
+            <li v-for="linea in pedido.lineas" :key="linea.productId">
+              {{ linea.productName }} - {{ linea.cantidad }} x {{ formatCurrency(linea.precioUnitario) }}
+            </li>
+          </ul>
+        </td>
         <td>{{ pedido.fecha }}</td>
-        <td>{{ formatCurrency(pedido.total) }}</td>
+        <td>{{ pedido.estado }}</td>
         <td>
           <ul v-if="pedido.customProducts.length > 0">
             <li v-for="custom in pedido.customProducts" :key="custom.id" style="margin-bottom: 8px;">
@@ -31,6 +38,7 @@
           </ul>
           <span v-else>Sin productos personalizados</span>
         </td>
+        <td>{{ formatCurrency(pedido.totalPedido) }}</td>
       </tr>
       </tbody>
     </table>
@@ -67,7 +75,7 @@ function formatCurrency(value) {
 
 <style scoped>
 .lista-pedidos {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 30px;
 }
