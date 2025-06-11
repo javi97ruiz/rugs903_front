@@ -66,8 +66,11 @@ export const useCarritoStore = defineStore('carrito', {
         },
 
         vaciarCarrito() {
-            this.items = []; // Se vacía visualmente
-            // No se borra del localStorage para que se recupere en el próximo login
+            this.items = [];
+            if (this.userId) {
+                localStorage.removeItem(`carrito_${this.userId}`);
+            }
         }
+
     }
 });

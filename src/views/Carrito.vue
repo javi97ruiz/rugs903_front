@@ -94,7 +94,6 @@ async function finalizarCompra() {
 
     if (response.data?.url && stripe) {
       window.location.href = response.data.url;
-      carritoStore.vaciarCarrito();
     } else {
       alert('Error iniciando el pago: respuesta inválida');
     }
