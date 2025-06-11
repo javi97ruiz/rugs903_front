@@ -110,7 +110,27 @@ const handleSignup = async () => {
   success.value = false
 
   try {
-    await api.post('/clients', form.value)  // ← cambiamos de axios a api
+    // Adaptamos el address al DTO esperado
+    const registerPayload = {
+      username: form.value.user.username,
+      password: form.value.user.password,
+      rol: "user", // podemos forzarlo
+      name: form.value.name,
+      surname: form.value.surname,
+      phoneNumber: form.value.phoneNumber,
+      address: {
+        calle: form.value.address.street,
+        numero: "1", // puedes añadir estos campos en el form más adelante
+        portal: "A",
+        piso: "1",
+        codigoPostal: form.value.address.postalCode,
+        ciudad: form.value.address.city,
+        provincia: form.value.address.country // en el form dices "país", pero la entidad es provincia → puedes ajustar el label o poner un campo extra para provincia
+      }
+    }
+
+    await api.post('/auth/register', registerPayload)
+
     success.value = true
 
     setTimeout(() => {
