@@ -78,6 +78,9 @@ useClickOutside(dropdownRef, () => {
               <router-link to="/admin/usuarios">Lista de usuarios</router-link>
             </li>
             <li v-if="auth.rol === 'admin'">
+              <router-link to="/admin/clientes">Clientes</router-link>
+            </li>
+            <li v-if="auth.rol === 'admin'">
               <router-link to="/admin/pedidos">Lista de pedidos</router-link>
             </li>
             <li v-if="auth.rol === 'admin'">

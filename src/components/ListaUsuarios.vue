@@ -2,12 +2,11 @@
   <div class="lista-usuarios">
     <h1>Lista de usuarios</h1>
 
-    <table>
+    <table v-if="usuarios.length > 0">
       <thead>
       <tr>
         <th>ID</th>
         <th>Email</th>
-        <th>Nombre</th>
         <th>Rol</th>
         <th>Acciones</th>
       </tr>
@@ -16,37 +15,63 @@
       <tr v-for="usuario in usuarios" :key="usuario.id">
         <td>{{ usuario.id }}</td>
         <td>{{ usuario.email }}</td>
-        <td>{{ usuario.nombre }}</td>
-        <td>{{ usuario.rol }}</td>
         <td>
-          <button @click="editar(usuario.id)">Editar</button>
+          <select v-model="usuario.rol" @change="actualizarRol(usuario)">
+            <option value="admin">Admin</option>
+            <option value="usuario">Usuario</option>
+          </select>
+        </td>
+        <td>
           <button @click="eliminar(usuario.id)">Eliminar</button>
         </td>
       </tr>
       </tbody>
     </table>
 
-    <div v-if="usuarios.length === 0" class="vacio">
+    <div v-else class="vacio">
       No hay usuarios registrados.
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import api from '@/api';
 
-const usuarios = ref([
-  { id: 1, email: 'admin@ejemplo.com', nombre: 'Admin Uno', rol: 'admin' },
-  { id: 2, email: 'cliente@ejemplo.com', nombre: 'Cliente Uno', rol: 'usuario' },
-  { id: 3, email: 'otro@ejemplo.com', nombre: 'Cliente Dos', rol: 'usuario' }
-]);
+const usuarios = ref([]);
 
-function editar(id) {
-  alert(`Editar usuario #${id}`);
+onMounted(async () => {
+  try {
+    const res = await api.get('/users/admin');
+    usuarios.value = res.data;
+  } catch (err) {
+    console.error('Error al cargar usuarios:', err);
+    usuarios.value = [];
+  }
+});
+
+async function actualizarRol(usuario) {
+  try {
+    await api.put(`/users/${usuario.id}`, {
+      email: usuario.email,
+      password: '', // opcional, depende de tu DTO (si es requerido, enviar el mismo u otro)
+      rol: usuario.rol
+    });
+    console.log('Rol actualizado');
+  } catch (err) {
+    console.error('Error al actualizar rol:', err);
+  }
 }
 
-function eliminar(id) {
-  alert(`Eliminar usuario #${id}`);
+async function eliminar(id) {
+  if (confirm('¿Seguro que quieres eliminar este usuario?')) {
+    try {
+      await api.delete(`/users/${id}`);
+      usuarios.value = usuarios.value.filter(u => u.id !== id);
+    } catch (err) {
+      console.error('Error al eliminar usuario:', err);
+    }
+  }
 }
 </script>
 
