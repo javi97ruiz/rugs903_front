@@ -29,7 +29,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import ProductoFijo from '@/components/ProductoFijo.vue'
-import imagenBrand from '@/assets/custom-img.jpg'
+import imagenBrand from '@/assets/custom-img.webp'
 import { useProductoStore } from '@/stores/productos'
 
 const productoStore = useProductoStore()
