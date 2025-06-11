@@ -2,6 +2,16 @@
   <div class="tienda">
     <h1>Panel Admin - Tienda</h1>
 
+    <!-- Filtro de estado -->
+    <div style="margin-bottom: 16px;">
+      <label for="filtroActivo">Filtrar por estado: </label>
+      <select id="filtroActivo" v-model="filtroActivo">
+        <option value="todos">Todos</option>
+        <option value="activos">Activos</option>
+        <option value="inactivos">Inactivos</option>
+      </select>
+    </div>
+
     <router-link to="/admin/crear">
       <button>Crear nuevo producto</button>
     </router-link>
@@ -16,6 +26,7 @@
           :imagen="producto.imagen"
           :modo-admin="true"
           :precio="producto.price"
+          :class="{ inactivo: !producto.isActive }"
           @editar="editarProducto"
           @borrar="borrarProducto"
       />
@@ -28,7 +39,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useNotificacionStore } from '@/stores/notificacion';
 import { useRouter } from 'vue-router';
 import ProductoFijo from '@/components/ProductoFijo.vue';
@@ -38,10 +49,19 @@ const notificacion = useNotificacionStore();
 const router = useRouter();
 
 const productos = ref([]);
+const filtroActivo = ref('todos'); // todos | activos | inactivos
 
+// Cargar productos con el filtro actual
 async function cargarProductos() {
   try {
-    const res = await api.get('/products');
+    let url = '/products';
+    if (filtroActivo.value === 'activos') {
+      url += '?active=true';
+    } else if (filtroActivo.value === 'inactivos') {
+      url += '?active=false';
+    }
+
+    const res = await api.get(url);
     productos.value = res.data;
   } catch (err) {
     console.error('Error al cargar productos:', err);
@@ -49,7 +69,13 @@ async function cargarProductos() {
   }
 }
 
+// Cargar productos al montar la vista
 onMounted(() => {
+  cargarProductos();
+});
+
+// Si cambia el filtro, recargar productos
+watch(filtroActivo, () => {
   cargarProductos();
 });
 
@@ -88,4 +114,10 @@ button {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 20px;
 }
+
+.inactivo {
+  opacity: 0.5;
+  background-color: #f9f9f9; /* color suave de fondo */
+}
+
 </style>

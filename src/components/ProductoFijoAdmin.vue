@@ -76,9 +76,8 @@ function handleImageUpload(event) {
 }
 
 async function guardarCambios() {
-  if (!nombre.value || !descripcion.value || precio.value <= 0) {
-    error.value = 'Todos los campos son obligatorios y el precio debe ser mayor que cero ❌';
-    return;
+  if (!validarProducto()) {
+    return; // no seguimos si la validación falla
   }
 
   error.value = '';
@@ -87,7 +86,7 @@ async function guardarCambios() {
     name: nombre.value,
     description: descripcion.value,
     price: precio.value,
-    quantity: productoOriginal.value.quantity, // No se edita aquí pero es obligatorio en el DTO
+    quantity: productoOriginal.value.quantity, // OK → obligatorio en DTO
     imagen: imagenPreview.value || productoOriginal.value.imagen,
   });
 
@@ -95,6 +94,32 @@ async function guardarCambios() {
 
   router.push('/tiendaAdmin');
 }
+
+
+function validarProducto() {
+  if (!nombre.value || nombre.value.trim().length < 3) {
+    error.value = 'El nombre del producto debe tener al menos 3 caracteres';
+    return false;
+  }
+
+  if (!descripcion.value || descripcion.value.trim().length < 10) {
+    error.value = 'La descripción del producto debe tener al menos 10 caracteres';
+    return false;
+  }
+
+  if (precio.value === null || isNaN(precio.value) || precio.value <= 0) {
+    error.value = 'El precio debe ser un número mayor que cero';
+    return false;
+  }
+
+  if (!imagenPreview.value && (!productoOriginal.value?.imagen || productoOriginal.value.imagen.trim() === '')) {
+    error.value = 'Debes proporcionar una imagen para el producto';
+    return false;
+  }
+
+  return true;
+}
+
 </script>
 
 

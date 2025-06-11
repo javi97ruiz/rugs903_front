@@ -5,7 +5,7 @@
       <!-- Productos desde la API -->
       <!-- Se mostrará imagenBrand hasta que tengas imágenes reales -->
       <ProductoFijo
-          v-for="producto in productos"
+          v-for="producto in productoStore.productos"
           :key="producto.id"
           :id="producto.id"
           :nombre="producto.name"
@@ -13,6 +13,7 @@
           :precio="producto.price"
           :imagen="producto.imagen"
       />
+
 
       <!-- Producto personalizado con mismo estilo -->
       <ProductoFijo
@@ -33,11 +34,13 @@ import imagenBrand from '@/assets/custom-img.webp'
 import { useProductoStore } from '@/stores/productos'
 
 const productoStore = useProductoStore()
-const productos = productoStore.productos
 
 onMounted(() => {
-  productoStore.fetchProductos()
+  if (productoStore.productos.length === 0) {
+    productoStore.fetchProductos()
+  }
 })
+
 </script>
 
 <style scoped>

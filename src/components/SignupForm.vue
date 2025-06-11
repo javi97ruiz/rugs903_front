@@ -46,6 +46,20 @@
             <label>Calle</label>
             <input v-model="form.address.street" type="text" required />
           </div>
+          <div class="form-group">
+            <label>Número</label>
+            <input v-model="form.address.numero" type="text" required />
+          </div>
+
+          <div class="form-group">
+            <label>Portal</label>
+            <input v-model="form.address.portal" type="text" required />
+          </div>
+
+          <div class="form-group">
+            <label>Piso</label>
+            <input v-model="form.address.piso" type="text" required />
+          </div>
 
           <div class="form-group">
             <label>Ciudad</label>
@@ -58,7 +72,7 @@
           </div>
 
           <div class="form-group">
-            <label>País</label>
+            <label>Provincia</label>
             <input v-model="form.address.country" type="text" required />
           </div>
         </div>
@@ -96,21 +110,93 @@ const form = ref({
   },
   address: {
     street: '',
-    city: '',
+    numero: '',
+    portal: '',
+    piso: '',
     postalCode: '',
+    city: '',
     country: ''
   }
-})
+});
+
 
 const error = ref(null)
 const success = ref(false)
 
 const handleSignup = async () => {
-  error.value = null
-  success.value = false
+  error.value = null;
+  success.value = false;
 
+  // Validaciones front antes de enviar
+  if (!form.value.name.trim()) {
+    error.value = 'Por favor introduce tu nombre';
+    return;
+  }
+
+  if (!form.value.surname.trim()) {
+    error.value = 'Por favor introduce tus apellidos';
+    return;
+  }
+
+  const phoneRegex = /^[6-9][0-9]{8}$/;
+  if (!phoneRegex.test(form.value.phoneNumber)) {
+    error.value = 'Por favor introduce un teléfono válido (9 cifras)';
+    return;
+  }
+
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(form.value.user.email)) {
+    error.value = 'Por favor introduce un email válido';
+    return;
+  }
+
+  if (!form.value.user.username.trim() || form.value.user.username.length < 3) {
+    error.value = 'El nombre de usuario debe tener al menos 3 caracteres';
+    return;
+  }
+
+  if (!form.value.user.password || form.value.user.password.length < 6) {
+    error.value = 'La contraseña debe tener al menos 6 caracteres';
+    return;
+  }
+
+  if (!form.value.address.street.trim()) {
+    error.value = 'Por favor introduce la calle';
+    return;
+  }
+  if (!form.value.address.numero.trim()) {
+    error.value = 'Por favor introduce el número';
+    return;
+  }
+
+  if (!form.value.address.portal.trim()) {
+    error.value = 'Por favor introduce el portal';
+    return;
+  }
+
+  if (!form.value.address.piso.trim()) {
+    error.value = 'Por favor introduce el piso';
+    return;
+  }
+
+  if (!form.value.address.city.trim()) {
+    error.value = 'Por favor introduce la ciudad';
+    return;
+  }
+
+  const postalCodeRegex = /^[0-9]{5}$/;
+  if (!postalCodeRegex.test(form.value.address.postalCode)) {
+    error.value = 'Por favor introduce un código postal válido de 5 cifras';
+    return;
+  }
+
+  if (!form.value.address.country.trim()) {
+    error.value = 'Por favor introduce la provincia';
+    return;
+  }
+
+  // Si todas las validaciones pasan → enviar al backend
   try {
-    // Adaptamos el address al DTO esperado
     const registerPayload = {
       username: form.value.user.username,
       password: form.value.user.password,
@@ -120,26 +206,27 @@ const handleSignup = async () => {
       phoneNumber: form.value.phoneNumber,
       address: {
         calle: form.value.address.street,
-        numero: "1", // puedes añadir estos campos en el form más adelante
-        portal: "A",
-        piso: "1",
+        numero: form.value.address.numero, // puedes añadir estos campos en el form más adelante
+        portal: form.value.address.portal,
+        piso: form.value.address.piso,
         codigoPostal: form.value.address.postalCode,
         ciudad: form.value.address.city,
-        provincia: form.value.address.country // en el form dices "país", pero la entidad es provincia → puedes ajustar el label o poner un campo extra para provincia
+        provincia: form.value.address.country // en el form dices "país", pero la entidad es provincia
       }
-    }
+    };
 
-    await api.post('/auth/register', registerPayload)
+    await api.post('/auth/register', registerPayload);
 
-    success.value = true
+    success.value = true;
 
     setTimeout(() => {
-      router.push('/login')
-    }, 1500)
+      router.push('/login');
+    }, 1500);
   } catch (err) {
-    error.value = err.response?.data?.message || 'Error al registrar usuario'
+    error.value = err.response?.data?.message || 'Error al registrar usuario';
   }
-}
+};
+
 
 </script>
 

@@ -22,8 +22,17 @@ api.interceptors.response.use(
     error => {
         if (error.response?.status === 401) {
             console.warn("Sesión caducada o no autorizada");
-            // Aquí podrías redirigir al login o hacer logout automático
+
+            const currentPath = window.location.pathname;
+            if (currentPath !== '/login') {
+                localStorage.removeItem('token');
+                localStorage.removeItem('rol');
+                localStorage.setItem('redirectAfterLogin', currentPath); // Guardamos la ruta previa
+                window.location.href = '/login';
+            }
         }
+
+
         /*
         if (error.response?.status === 403) {
             localStorage.removeItem('token');

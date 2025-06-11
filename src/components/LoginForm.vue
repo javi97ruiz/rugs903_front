@@ -50,30 +50,38 @@ const router = useRouter()
 const authStore = useAuthStore() // <-- USO DEL STORE
 
 const handleLogin = async () => {
-  error.value = null
+  error.value = null;
   try {
     const response = await api.post('/auth/login', {
       username: username.value,
       password: password.value
-    })
+    });
 
-    const token = response.data.token
-    const rol = response.data.rol || 'usuario' // Asegúrate que esto viene del backend
+    const token = response.data.token;
+    const rol = response.data.rol || 'usuario';
 
-    localStorage.setItem('token', token)
-    localStorage.setItem('rol', rol)
-    authStore.login(token, rol) // <-- ACTUALIZA PINIA
+    localStorage.setItem('token', token);
+    localStorage.setItem('rol', rol);
+    authStore.login(token, rol);
 
-    await router.push('/')
+    // Nueva lógica: redirección tras login
+    const redirectPath = localStorage.getItem('redirectAfterLogin') || '/';
+    localStorage.removeItem('redirectAfterLogin');
+    console.log('Redirigiendo a:', redirectPath);
+    await router.push(redirectPath);
 
   } catch (err) {
     if (err.response?.status === 401) {
-      error.value = 'Credenciales incorrectas'
+      error.value = 'Credenciales incorrectas';
+    } else if (err.response?.status === 403) {
+      error.value = 'Cuenta desactivada, si cree que es un error póngase en contacto';
     } else {
-      error.value = 'Error al iniciar sesión'
+      error.value = 'Error al iniciar sesión';
     }
   }
-}
+};
+
+
 </script>
 
 

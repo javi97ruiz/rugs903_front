@@ -2,6 +2,17 @@
   <div class="lista-clientes">
     <h1>Lista de clientes</h1>
 
+    <!-- Filtro de estado -->
+    <div style="margin-bottom: 16px;">
+      <label for="filtroActivo">Filtrar por estado: </label>
+      <select id="filtroActivo" v-model="filtroActivo">
+        <option value="todos">Todos</option>
+        <option value="activos">Activos</option>
+        <option value="inactivos">Inactivos</option>
+      </select>
+    </div>
+
+    <!-- Tabla de clientes -->
     <table v-if="clientes.length > 0">
       <thead>
       <tr>
@@ -11,24 +22,24 @@
         <th>Teléfono</th>
         <th>Email</th>
         <th>Rol</th>
+        <th>Activo</th>
         <th>Dirección</th>
         <th>Acciones</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="cliente in clientes" :key="cliente.id">
-        <td>{{ cliente.id }}</td>
-        <td>
-          <input v-model="cliente.name" />
-        </td>
-        <td>
-          <input v-model="cliente.surname" />
-        </td>
-        <td>
-          <input v-model="cliente.phoneNumber" />
-        </td>
+      <tr
+          v-for="cliente in clientes"
+          :key="cliente.id"
+          :class="{ inactivo: !cliente.isActive }"
+      >
+      <td>{{ cliente.id }}</td>
+        <td><input v-model="cliente.name" /></td>
+        <td><input v-model="cliente.surname" /></td>
+        <td><input v-model="cliente.phoneNumber" /></td>
         <td>{{ cliente.user.username }}</td>
         <td>{{ cliente.user.rol }}</td>
+        <td>{{ cliente.isActive }}</td>
         <td>
           {{ cliente.address.calle }}, {{ cliente.address.numero }},
           {{ cliente.address.portal }}, {{ cliente.address.piso }},
@@ -43,6 +54,7 @@
       </tbody>
     </table>
 
+    <!-- Mensaje si no hay clientes -->
     <div v-else class="vacio">
       No hay clientes registrados.
     </div>
@@ -79,15 +91,15 @@
         <button @click="cerrarModalUsuario">Cancelar</button>
       </div>
     </div>
-
   </div>
 </template>
 
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue';
 import api from '@/api';
 
 const clientes = ref([]);
+const filtroActivo = ref('todos'); // todos | activos | inactivos
 const modalDireccion = ref(false);
 const modalUsuario = ref(false);
 const direccionForm = reactive({});
@@ -95,16 +107,35 @@ const usuarioForm = reactive({});
 const currentDireccionId = ref(null);
 const currentUsuarioId = ref(null);
 
-onMounted(async () => {
+// Cargar clientes con el filtro actual
+async function cargarClientes() {
   try {
-    const res = await api.get('/clients/admin');
+    let url = '/clients/admin';
+    if (filtroActivo.value === 'activos') {
+      url += '?active=true';
+    } else if (filtroActivo.value === 'inactivos') {
+      url += '?active=false';
+    }
+
+    const res = await api.get(url);
     clientes.value = res.data;
   } catch (err) {
     console.error('Error al cargar clientes:', err);
     clientes.value = [];
   }
+}
+
+// Cargar clientes al montar la vista
+onMounted(() => {
+  cargarClientes();
 });
 
+// Si cambia el filtro, recargar clientes
+watch(filtroActivo, () => {
+  cargarClientes();
+});
+
+// Guardar cambios del cliente
 async function guardarCambios(cliente) {
   try {
     await api.put(`/clients/${cliente.id}`, {
@@ -120,6 +151,7 @@ async function guardarCambios(cliente) {
   }
 }
 
+// Modal dirección
 function abrirEditarDireccion(cliente) {
   direccionForm.id = cliente.address.id;
   direccionForm.calle = cliente.address.calle;
@@ -138,7 +170,7 @@ async function guardarDireccion() {
     await api.put(`/direcciones/${currentDireccionId.value}`, direccionForm);
     alert('Dirección actualizada');
     cerrarModalDireccion();
-    await recargarClientes();
+    await cargarClientes();
   } catch (err) {
     console.error('Error al actualizar dirección:', err);
   }
@@ -148,6 +180,7 @@ function cerrarModalDireccion() {
   modalDireccion.value = false;
 }
 
+// Modal usuario
 function abrirEditarUsuario(cliente) {
   usuarioForm.username = cliente.user.username;
   usuarioForm.rol = cliente.user.rol;
@@ -165,7 +198,7 @@ async function guardarUsuario() {
     });
     alert('Usuario actualizado');
     cerrarModalUsuario();
-    await recargarClientes();
+    await cargarClientes();
   } catch (err) {
     console.error('Error al actualizar usuario:', err);
   }
@@ -174,18 +207,10 @@ async function guardarUsuario() {
 function cerrarModalUsuario() {
   modalUsuario.value = false;
 }
-
-async function recargarClientes() {
-  try {
-    const res = await api.get('/clients/admin');
-    clientes.value = res.data;
-  } catch (err) {
-    console.error('Error al recargar clientes:', err);
-  }
-}
 </script>
 
 <style scoped>
+/* El mismo CSS que ya tienes, sin cambios */
 .lista-clientes {
   max-width: 1200px;
   margin: 0 auto;
@@ -256,4 +281,14 @@ button:hover {
   display: block;
   margin-bottom: 10px;
 }
+
+.inactivo {
+  opacity: 0.5;
+  background-color: #f9f9f9; /* color suave de fondo */
+}
+
+.inactivo td {
+  color: #888;
+}
+
 </style>

@@ -2,27 +2,42 @@
   <div class="lista-usuarios">
     <h1>Lista de usuarios</h1>
 
+    <!-- Filtro de estado -->
+    <div style="margin-bottom: 16px;">
+      <label for="filtroActivo">Filtrar por estado: </label>
+      <select id="filtroActivo" v-model="filtroActivo">
+        <option value="todos">Todos</option>
+        <option value="activos">Activos</option>
+        <option value="inactivos">Inactivos</option>
+      </select>
+    </div>
+
+    <!-- Tabla de usuarios -->
     <table v-if="usuarios.length > 0">
       <thead>
       <tr>
         <th>ID</th>
-        <th>Username</th> <!-- en realidad username -->
+        <th>Username</th>
         <th>Rol</th>
         <th>Activo</th>
         <th>Acciones</th>
       </tr>
       </thead>
       <tbody>
-      <tr v-for="usuario in usuarios" :key="usuario.id">
-        <td>{{ usuario.id }}</td>
-        <td>{{ usuario.username }}</td> <!-- CORRECTO -->
+      <tr
+          v-for="usuario in usuarios"
+          :key="usuario.id"
+          :class="{ inactivo: !usuario.isActive }"
+      >
+      <td>{{ usuario.id }}</td>
+        <td>{{ usuario.username }}</td>
         <td>
           <select v-model="usuario.rol" @change="actualizarRol(usuario)">
             <option value="admin">Admin</option>
             <option value="user">Usuario</option>
           </select>
         </td>
-        <td>{{ usuario.isActive }}</td> <!-- puedes mostrar true/false -->
+        <td>{{ usuario.isActive }}</td>
         <td>
           <button @click="eliminar(usuario.id)">Eliminar</button>
         </td>
@@ -30,7 +45,7 @@
       </tbody>
     </table>
 
-
+    <!-- Mensaje si no hay usuarios -->
     <div v-else class="vacio">
       No hay usuarios registrados.
     </div>
@@ -38,26 +53,46 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import api from '@/api';
 
 const usuarios = ref([]);
+const filtroActivo = ref('todos'); // todos | activos | inactivos
 
-onMounted(async () => {
+// Cargar usuarios con el filtro actual
+async function cargarUsuarios() {
   try {
-    const res = await api.get('/users/admin');
+    let url = '/users/admin';
+    if (filtroActivo.value === 'activos') {
+      url += '?active=true';
+    } else if (filtroActivo.value === 'inactivos') {
+      url += '?active=false';
+    }
+
+    const res = await api.get(url);
     usuarios.value = res.data;
   } catch (err) {
     console.error('Error al cargar usuarios:', err);
     usuarios.value = [];
   }
+}
+
+// Cargar usuarios al montar la vista
+onMounted(() => {
+  cargarUsuarios();
 });
 
+// Si cambia el filtro, recargar usuarios
+watch(filtroActivo, () => {
+  cargarUsuarios();
+});
+
+// Actualizar rol de usuario
 async function actualizarRol(usuario) {
   try {
     await api.put(`/users/${usuario.id}`, {
-      email: usuario.email,
-      password: '', // opcional, depende de tu DTO (si es requerido, enviar el mismo u otro)
+      username: usuario.username,
+      password: '', // si tu DTO lo requiere (si no, puedes omitirlo)
       rol: usuario.rol
     });
     console.log('Rol actualizado');
@@ -66,11 +101,13 @@ async function actualizarRol(usuario) {
   }
 }
 
+// Eliminar usuario (borrado lógico)
 async function eliminar(id) {
   if (confirm('¿Seguro que quieres eliminar este usuario?')) {
     try {
       await api.delete(`/users/${id}`);
-      usuarios.value = usuarios.value.filter(u => u.id !== id);
+      // Recargar lista completa tras eliminar
+      cargarUsuarios();
     } catch (err) {
       console.error('Error al eliminar usuario:', err);
     }
@@ -121,4 +158,14 @@ button:hover {
   text-align: center;
   color: #666;
 }
+
+.inactivo {
+  opacity: 0.5;
+  background-color: #f9f9f9; /* color suave de fondo */
+}
+
+.inactivo td {
+  color: #888;
+}
+
 </style>
