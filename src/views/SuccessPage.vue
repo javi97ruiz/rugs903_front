@@ -13,8 +13,13 @@ import { onMounted } from 'vue';
 const carrito = useCarritoStore();
 
 onMounted(() => {
+  console.log('🟢 Success mounted');
+  console.log('Auth userId:', auth.user?.id);
+  console.log('Carrito userId antes de vaciar:', carrito.userId);
   carrito.vaciarCarrito();
+  console.log('Carrito después de vaciar:', carrito.items);
 });
+
 </script>
 
 <style scoped>
