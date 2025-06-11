@@ -35,6 +35,7 @@
           <ul>
             <li v-for="custom in pedido.customProducts" :key="custom.id">
               {{ custom.name }} - {{ custom.height }}x{{ custom.length }} cm <br />
+              <strong>Precio:</strong> {{ formatPrecio(custom.price) }} <br />
               <img :src="custom.imageUrl" alt="Imagen personalizada" style="width: 80px; margin-top: 5px;" />
             </li>
           </ul>
