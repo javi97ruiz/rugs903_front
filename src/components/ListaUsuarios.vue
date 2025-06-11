@@ -6,7 +6,7 @@
       <thead>
       <tr>
         <th>ID</th>
-        <th>Email</th> <!-- en realidad username -->
+        <th>Username</th> <!-- en realidad username -->
         <th>Rol</th>
         <th>Activo</th>
         <th>Acciones</th>
