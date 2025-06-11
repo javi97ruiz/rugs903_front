@@ -37,19 +37,13 @@ async function crearProducto() {
   }
 
   try {
-    const formData = new FormData();
-    formData.append('image', imagenFile.value);
-    formData.append('name', 'Producto Personalizado');
-    formData.append('height', parseInt(altura.value));
-    formData.append('length', parseInt(anchura.value));
-    formData.append('price', precioCalculado.value);
-
-    const response = await api.post('/custom-products', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    });
-
+    const response = await api.post('/custom-products', {
+      name: 'Producto Personalizado',
+      height: parseInt(altura.value),
+      length: parseInt(anchura.value),
+      price: precioCalculado.value,
+      imageUrl: imagenPreview.value
+    })
 
     notificacion.mostrar('Producto personalizado creado ✅', 3000, 'verde')
     console.log(response.data)
