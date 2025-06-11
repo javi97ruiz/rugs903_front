@@ -6,27 +6,30 @@
       <thead>
       <tr>
         <th>ID</th>
-        <th>Email</th>
+        <th>Email</th> <!-- en realidad username -->
         <th>Rol</th>
+        <th>Activo</th>
         <th>Acciones</th>
       </tr>
       </thead>
       <tbody>
       <tr v-for="usuario in usuarios" :key="usuario.id">
         <td>{{ usuario.id }}</td>
-        <td>{{ usuario.email }}</td>
+        <td>{{ usuario.username }}</td> <!-- CORRECTO -->
         <td>
           <select v-model="usuario.rol" @change="actualizarRol(usuario)">
             <option value="admin">Admin</option>
-            <option value="usuario">Usuario</option>
+            <option value="user">Usuario</option>
           </select>
         </td>
+        <td>{{ usuario.isActive }}</td> <!-- puedes mostrar true/false -->
         <td>
           <button @click="eliminar(usuario.id)">Eliminar</button>
         </td>
       </tr>
       </tbody>
     </table>
+
 
     <div v-else class="vacio">
       No hay usuarios registrados.
