@@ -35,7 +35,7 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useProductoStore } from '@/stores/producto.js';
+import { useProductoStore } from '@/stores/productos.js';
 import { useNotificacionStore } from '@/stores/notificacion';
 
 const route = useRoute();
