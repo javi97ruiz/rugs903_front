@@ -52,22 +52,22 @@ const heroSlides = ref([
 const featuredProducts = ref([
   {
     id: 1,
-    name: "Alfombra Geométrica Moderna",
-    price: 89.99,
+    name: "Alfombra Los Simpson",
+    price: 90,
     image: imagenBrand,
     badge: "Más Vendida"
   },
   {
     id: 2,
-    name: "Alfombra Floral Vintage",
-    price: 124.99,
+    name: "Alfombra Gengar",
+    price: 125,
     image: imagenBrand2,
     badge: "Nueva"
   },
   {
     id: 3,
-    name: "Alfombra Minimalista",
-    price: 79.99,
+    name: "Alfombra Gengar 2 colores soft",
+    price: 150,
     image: imagenBrand3,
     badge: "Oferta"
   }
