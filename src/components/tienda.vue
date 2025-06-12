@@ -5,7 +5,7 @@
       <!-- Productos desde la API -->
       <!-- Se mostrará imagenBrand hasta que tengas imágenes reales -->
       <ProductoFijo
-          v-for="producto in productoStore.productos"
+          v-for="producto in productoStore.productos.filter(p => p.isActive)"
           :key="producto.id"
           :id="producto.id"
           :nombre="producto.name"
@@ -13,6 +13,7 @@
           :precio="producto.price"
           :imagen="producto.imagen"
       />
+
 
 
       <!-- Producto personalizado con mismo estilo -->
