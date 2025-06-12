@@ -34,13 +34,6 @@
         </ul>
       </nav>
 
-      <!-- Sección derecha: Perfil y carrito -->
-      <div class="right-section">
-        <!-- DEBUG: Mostrar estado -->
-        <div style="color: white; font-size: 12px; margin-right: 10px;">
-          Debug: {{ mostrarMenu ? 'ABIERTO' : 'CERRADO' }} | Auth: {{ auth.isLoggedIn ? 'SI' : 'NO' }}
-        </div>
-
         <!-- Perfil -->
         <div class="perfil-dropdown" v-if="auth.isLoggedIn">
           <div class="perfil-trigger" @click="toggleDropdown">
