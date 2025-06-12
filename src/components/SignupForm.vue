@@ -826,6 +826,7 @@ async function handleSubmit() {
   try {
     const registerPayload = {
       username: form.value.user.username.trim(),
+      email: form.value.user.email.trim(),
       password: form.value.user.password,
       rol: "user",
       name: form.value.name.trim(),

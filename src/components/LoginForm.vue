@@ -286,7 +286,7 @@ async function handleLogin() {
     // Handle redirect
     const redirectPath = route.query.redirect ||
         localStorage.getItem('redirectAfterLogin') ||
-        (rol === 'admin' ? '/admin' : '/')
+        (rol === 'admin' ? '/' : '/')
 
     localStorage.removeItem('redirectAfterLogin')
 
