@@ -124,7 +124,7 @@
 
           <div class="pedido-total">
             <span class="total-label">Total</span>
-            <span class="total-amount">{{ formatPrecio(pedido.totalPedido) }}</span>
+            <span class="total-amount">{{ formatPrecio(pedido.totalPedido*1.21) }}</span>
           </div>
 
           <div class="pedido-toggle">
@@ -401,7 +401,7 @@ function getEstadoTexto(estado) {
     entregado: 'Entregado',
     cancelado: 'Cancelado'
   }
-  return textos[estado] || 'Pendiente'
+  return textos[estado] || 'pendiente'
 }
 
 function isEstadoCompleto(estadoKey, estadoActual) {
