@@ -1,296 +1,3 @@
-<script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import api from '@/api';
-import { formatPrecio } from '@/utils/formato';
-import { useCarritoStore } from '@/stores/carrito';
-import { useNotificacionStore } from '@/stores/notificacion';
-import { useAuthStore } from '@/stores/auth';
-
-const route = useRoute();
-const router = useRouter();
-const productoId = route.params.id;
-const producto = ref(null);
-const cantidad = ref(1);
-const loading = ref(true);
-const error = ref(null);
-const activeTab = ref('descripcion');
-const selectedImage = ref(0);
-const productosRelacionados = ref([]);
-const reviews = ref([]);
-const reviewsLoading = ref(false);
-const showReviewForm = ref(false);
-const newReview = ref({
-  rating: 5,
-  comment: ''
-});
-const submittingReview = ref(false);
-
-const carrito = useCarritoStore();
-const notificacion = useNotificacionStore();
-const auth = useAuthStore();
-
-// Computed properties
-const isInStock = computed(() => {
-  return producto.value?.stock > 0;
-});
-
-const averageRating = computed(() => {
-  if (!reviews.value.length) return 0;
-  const sum = reviews.value.reduce((acc, review) => acc + review.rating, 0);
-  return Math.round((sum / reviews.value.length) * 10) / 10;
-});
-
-const ratingDistribution = computed(() => {
-  const distribution = [0, 0, 0, 0, 0]; // 5 stars to 1 star
-
-  if (!reviews.value.length) return distribution;
-
-  reviews.value.forEach(review => {
-    if (review.rating >= 1 && review.rating <= 5) {
-      distribution[5 - review.rating]++;
-    }
-  });
-
-  return distribution;
-});
-
-const ratingPercentages = computed(() => {
-  return ratingDistribution.value.map(count => {
-    if (!reviews.value.length) return 0;
-    return Math.round((count / reviews.value.length) * 100);
-  });
-});
-
-const productImages = computed(() => {
-  if (!producto.value) return [];
-
-  // If product has gallery images, use those
-  if (producto.value.gallery && producto.value.gallery.length) {
-    return producto.value.gallery;
-  }
-
-  // Otherwise, use the main image
-  return [producto.value.imagen];
-});
-
-// Methods
-async function fetchProducto() {
-  loading.value = true;
-  error.value = null;
-
-  try {
-    const response = await api.get(`/products/${productoId}`);
-    producto.value = response.data;
-
-    // If no gallery, create a mock one for demo purposes
-    if (!producto.value.gallery) {
-      producto.value.gallery = [
-        producto.value.imagen,
-        producto.value.imagen,
-        producto.value.imagen
-      ];
-    }
-
-    // If no specifications, create mock ones for demo
-    if (!producto.value.specifications) {
-      producto.value.specifications = {
-        material: 'Algodón',
-        dimensiones: '30 x 20 x 10 cm',
-        peso: '250g',
-        color: 'Varios colores',
-        fabricante: 'Marca Original'
-      };
-    }
-
-  } catch (error) {
-    console.error('Error al cargar el producto:', error);
-    error.value = 'No se pudo cargar el producto. Por favor, inténtalo de nuevo más tarde.';
-  } finally {
-    loading.value = false;
-  }
-}
-
-async function fetchRelacionados() {
-  try {
-    // In a real app, you'd call an endpoint like /products/related/{id}
-    // Here we're simulating it with a general products call
-    const response = await api.get('/products?limit=4');
-    productosRelacionados.value = response.data.filter(p => p.id !== productoId);
-  } catch (error) {
-    console.error('Error al cargar productos relacionados:', error);
-  }
-}
-
-async function fetchReviews() {
-  reviewsLoading.value = true;
-
-  try {
-    // In a real app, you'd call an endpoint like /products/{id}/reviews
-    // Here we're simulating it with mock data
-    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
-
-    reviews.value = [
-      {
-        id: 1,
-        user: 'María G.',
-        rating: 5,
-        date: '2023-10-15',
-        comment: 'Excelente producto, muy buena calidad y entrega rápida. Lo recomiendo totalmente.',
-        avatar: 'https://i.pravatar.cc/100?img=1'
-      },
-      {
-        id: 2,
-        user: 'Carlos R.',
-        rating: 4,
-        date: '2023-09-22',
-        comment: 'Buen producto, cumple con lo esperado. La entrega fue un poco lenta.',
-        avatar: 'https://i.pravatar.cc/100?img=2'
-      },
-      {
-        id: 3,
-        user: 'Laura M.',
-        rating: 5,
-        date: '2023-08-30',
-        comment: 'Me encantó, es exactamente lo que estaba buscando. Volveré a comprar.',
-        avatar: 'https://i.pravatar.cc/100?img=3'
-      }
-    ];
-  } catch (error) {
-    console.error('Error al cargar reseñas:', error);
-  } finally {
-    reviewsLoading.value = false;
-  }
-}
-
-function addAlCarrito() {
-  if (!producto.value) return;
-
-  if (cantidad.value < 1) {
-    notificacion.mostrar('Por favor, selecciona al menos 1 unidad', 3000, 'roja');
-    return;
-  }
-
-  if (cantidad.value > producto.value.stock) {
-    notificacion.mostrar(`Solo hay ${producto.value.stock} unidades disponibles`, 3000, 'roja');
-    return;
-  }
-
-  carrito.agregarProducto({
-    id: producto.value.id,
-    nombre: producto.value.name,
-    imagen: producto.value.imagen,
-    precio: producto.value.price,
-    cantidad: cantidad.value
-  });
-
-  notificacion.mostrar(`${cantidad.value} ${cantidad.value > 1 ? 'unidades' : 'unidad'} añadidas al carrito ✅`, 3000, 'verde');
-
-  // Show cart animation
-  const cartIcon = document.querySelector('.cart-icon');
-  if (cartIcon) {
-    cartIcon.classList.add('cart-animation');
-    setTimeout(() => {
-      cartIcon.classList.remove('cart-animation');
-    }, 1000);
-  }
-}
-
-function comprarAhora() {
-  addAlCarrito();
-  router.push('/carrito');
-}
-
-function incrementarCantidad() {
-  if (producto.value && cantidad.value < producto.value.stock) {
-    cantidad.value++;
-  }
-}
-
-function decrementarCantidad() {
-  if (cantidad.value > 1) {
-    cantidad.value--;
-  }
-}
-
-function changeImage(index) {
-  selectedImage.value = index;
-}
-
-function submitReview() {
-  if (!auth.isLoggedIn) {
-    notificacion.mostrar('Debes iniciar sesión para dejar una reseña', 3000, 'roja');
-    router.push('/login?redirect=' + route.fullPath);
-    return;
-  }
-
-  if (!newReview.value.comment.trim()) {
-    notificacion.mostrar('Por favor, escribe un comentario', 3000, 'roja');
-    return;
-  }
-
-  submittingReview.value = true;
-
-  // Simulate API call
-  setTimeout(() => {
-    const review = {
-      id: Date.now(),
-      user: auth.user?.name || 'Usuario',
-      rating: newReview.value.rating,
-      date: new Date().toISOString().split('T')[0],
-      comment: newReview.value.comment,
-      avatar: 'https://i.pravatar.cc/100?img=4'
-    };
-
-    reviews.value.unshift(review);
-    newReview.value = { rating: 5, comment: '' };
-    showReviewForm.value = false;
-    submittingReview.value = false;
-
-    notificacion.mostrar('¡Gracias por tu reseña!', 3000, 'verde');
-  }, 1000);
-}
-
-function shareProduct() {
-  if (navigator.share) {
-    navigator.share({
-      title: producto.value.name,
-      text: producto.value.description,
-      url: window.location.href
-    })
-        .then(() => notificacion.mostrar('¡Compartido con éxito!', 3000, 'verde'))
-        .catch(error => console.error('Error al compartir:', error));
-  } else {
-    // Fallback for browsers that don't support Web Share API
-    navigator.clipboard.writeText(window.location.href)
-        .then(() => notificacion.mostrar('Enlace copiado al portapapeles', 3000, 'verde'))
-        .catch(() => notificacion.mostrar('No se pudo copiar el enlace', 3000, 'roja'));
-  }
-}
-
-// Lifecycle hooks
-onMounted(async () => {
-  await fetchProducto();
-  if (producto.value) {
-    fetchRelacionados();
-    fetchReviews();
-  }
-});
-
-// Watch for route changes to reload product when navigating between product pages
-watch(() => route.params.id, async (newId) => {
-  if (newId !== productoId) {
-    selectedImage.value = 0;
-    activeTab.value = 'descripcion';
-    await fetchProducto();
-    if (producto.value) {
-      fetchRelacionados();
-      fetchReviews();
-    }
-  }
-});
-</script>
-
 <template>
   <div class="producto-detalle-container">
     <!-- Loading State -->
@@ -695,9 +402,302 @@ watch(() => route.params.id, async (newId) => {
   </div>
 </template>
 
+<script setup>
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import api from '@/api';
+import { formatPrecio } from '@/utils/formato';
+import { useCarritoStore } from '@/stores/carrito';
+import { useNotificacionStore } from '@/stores/notificacion';
+import { useAuthStore } from '@/stores/auth';
+
+const route = useRoute();
+const router = useRouter();
+const productoId = route.params.id;
+const producto = ref(null);
+const cantidad = ref(1);
+const loading = ref(true);
+const error = ref(null);
+const activeTab = ref('descripcion');
+const selectedImage = ref(0);
+const productosRelacionados = ref([]);
+const reviews = ref([]);
+const reviewsLoading = ref(false);
+const showReviewForm = ref(false);
+const newReview = ref({
+  rating: 5,
+  comment: ''
+});
+const submittingReview = ref(false);
+
+const carrito = useCarritoStore();
+const notificacion = useNotificacionStore();
+const auth = useAuthStore();
+
+// Computed properties
+const isInStock = computed(() => {
+  return producto.value?.stock > 0;
+});
+
+const averageRating = computed(() => {
+  if (!reviews.value.length) return 0;
+  const sum = reviews.value.reduce((acc, review) => acc + review.rating, 0);
+  return Math.round((sum / reviews.value.length) * 10) / 10;
+});
+
+const ratingDistribution = computed(() => {
+  const distribution = [0, 0, 0, 0, 0]; // 5 stars to 1 star
+
+  if (!reviews.value.length) return distribution;
+
+  reviews.value.forEach(review => {
+    if (review.rating >= 1 && review.rating <= 5) {
+      distribution[5 - review.rating]++;
+    }
+  });
+
+  return distribution;
+});
+
+const ratingPercentages = computed(() => {
+  return ratingDistribution.value.map(count => {
+    if (!reviews.value.length) return 0;
+    return Math.round((count / reviews.value.length) * 100);
+  });
+});
+
+const productImages = computed(() => {
+  if (!producto.value) return [];
+
+  // If product has gallery images, use those
+  if (producto.value.gallery && producto.value.gallery.length) {
+    return producto.value.gallery;
+  }
+
+  // Otherwise, use the main image
+  return [producto.value.imagen];
+});
+
+// Methods
+async function fetchProducto() {
+  loading.value = true;
+  error.value = null;
+
+  try {
+    const response = await api.get(`/products/${productoId}`);
+    producto.value = response.data;
+
+    // If no gallery, create a mock one for demo purposes
+    if (!producto.value.gallery) {
+      producto.value.gallery = [
+        producto.value.imagen,
+        producto.value.imagen,
+        producto.value.imagen
+      ];
+    }
+
+    // If no specifications, create mock ones for demo
+    if (!producto.value.specifications) {
+      producto.value.specifications = {
+        material: 'Algodón',
+        dimensiones: '30 x 20 x 10 cm',
+        peso: '250g',
+        color: 'Varios colores',
+        fabricante: 'Marca Original'
+      };
+    }
+
+  } catch (error) {
+    console.error('Error al cargar el producto:', error);
+    error.value = 'No se pudo cargar el producto. Por favor, inténtalo de nuevo más tarde.';
+  } finally {
+    loading.value = false;
+  }
+}
+
+async function fetchRelacionados() {
+  try {
+    // In a real app, you'd call an endpoint like /products/related/{id}
+    // Here we're simulating it with a general products call
+    const response = await api.get('/products?limit=4');
+    productosRelacionados.value = response.data.filter(p => p.id !== productoId);
+  } catch (error) {
+    console.error('Error al cargar productos relacionados:', error);
+  }
+}
+
+async function fetchReviews() {
+  reviewsLoading.value = true;
+
+  try {
+    // In a real app, you'd call an endpoint like /products/{id}/reviews
+    // Here we're simulating it with mock data
+    await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+
+    reviews.value = [
+      {
+        id: 1,
+        user: 'María G.',
+        rating: 5,
+        date: '2023-10-15',
+        comment: 'Excelente producto, muy buena calidad y entrega rápida. Lo recomiendo totalmente.',
+        avatar: 'https://i.pravatar.cc/100?img=1'
+      },
+      {
+        id: 2,
+        user: 'Carlos R.',
+        rating: 4,
+        date: '2023-09-22',
+        comment: 'Buen producto, cumple con lo esperado. La entrega fue un poco lenta.',
+        avatar: 'https://i.pravatar.cc/100?img=2'
+      },
+      {
+        id: 3,
+        user: 'Laura M.',
+        rating: 5,
+        date: '2023-08-30',
+        comment: 'Me encantó, es exactamente lo que estaba buscando. Volveré a comprar.',
+        avatar: 'https://i.pravatar.cc/100?img=3'
+      }
+    ];
+  } catch (error) {
+    console.error('Error al cargar reseñas:', error);
+  } finally {
+    reviewsLoading.value = false;
+  }
+}
+
+function addAlCarrito() {
+  if (!producto.value) return;
+
+  if (cantidad.value < 1) {
+    notificacion.mostrar('Por favor, selecciona al menos 1 unidad', 3000, 'roja');
+    return;
+  }
+
+  if (cantidad.value > producto.value.stock) {
+    notificacion.mostrar(`Solo hay ${producto.value.stock} unidades disponibles`, 3000, 'roja');
+    return;
+  }
+
+  carrito.agregarProducto({
+    id: producto.value.id,
+    nombre: producto.value.name,
+    imagen: producto.value.imagen,
+    precio: producto.value.price,
+    cantidad: cantidad.value
+  });
+
+  notificacion.mostrar(`${cantidad.value} ${cantidad.value > 1 ? 'unidades' : 'unidad'} añadidas al carrito ✅`, 3000, 'verde');
+
+  // Show cart animation
+  const cartIcon = document.querySelector('.cart-icon');
+  if (cartIcon) {
+    cartIcon.classList.add('cart-animation');
+    setTimeout(() => {
+      cartIcon.classList.remove('cart-animation');
+    }, 1000);
+  }
+}
+
+function comprarAhora() {
+  addAlCarrito();
+  router.push('/carrito');
+}
+
+function incrementarCantidad() {
+  if (producto.value && cantidad.value < producto.value.stock) {
+    cantidad.value++;
+  }
+}
+
+function decrementarCantidad() {
+  if (cantidad.value > 1) {
+    cantidad.value--;
+  }
+}
+
+function changeImage(index) {
+  selectedImage.value = index;
+}
+
+function submitReview() {
+  if (!auth.isLoggedIn) {
+    notificacion.mostrar('Debes iniciar sesión para dejar una reseña', 3000, 'roja');
+    router.push('/login?redirect=' + route.fullPath);
+    return;
+  }
+
+  if (!newReview.value.comment.trim()) {
+    notificacion.mostrar('Por favor, escribe un comentario', 3000, 'roja');
+    return;
+  }
+
+  submittingReview.value = true;
+
+  // Simulate API call
+  setTimeout(() => {
+    const review = {
+      id: Date.now(),
+      user: auth.user?.name || 'Usuario',
+      rating: newReview.value.rating,
+      date: new Date().toISOString().split('T')[0],
+      comment: newReview.value.comment,
+      avatar: 'https://i.pravatar.cc/100?img=4'
+    };
+
+    reviews.value.unshift(review);
+    newReview.value = { rating: 5, comment: '' };
+    showReviewForm.value = false;
+    submittingReview.value = false;
+
+    notificacion.mostrar('¡Gracias por tu reseña!', 3000, 'verde');
+  }, 1000);
+}
+
+function shareProduct() {
+  if (navigator.share) {
+    navigator.share({
+      title: producto.value.name,
+      text: producto.value.description,
+      url: window.location.href
+    })
+        .then(() => notificacion.mostrar('¡Compartido con éxito!', 3000, 'verde'))
+        .catch(error => console.error('Error al compartir:', error));
+  } else {
+    // Fallback for browsers that don't support Web Share API
+    navigator.clipboard.writeText(window.location.href)
+        .then(() => notificacion.mostrar('Enlace copiado al portapapeles', 3000, 'verde'))
+        .catch(() => notificacion.mostrar('No se pudo copiar el enlace', 3000, 'roja'));
+  }
+}
+
+// Lifecycle hooks
+onMounted(async () => {
+  await fetchProducto();
+  if (producto.value) {
+    fetchRelacionados();
+    fetchReviews();
+  }
+});
+
+// Watch for route changes to reload product when navigating between product pages
+watch(() => route.params.id, async (newId) => {
+  if (newId !== productoId) {
+    selectedImage.value = 0;
+    activeTab.value = 'descripcion';
+    await fetchProducto();
+    if (producto.value) {
+      fetchRelacionados();
+      fetchReviews();
+    }
+  }
+});
+</script>
+
 <style scoped>
 .producto-detalle-container {
-  max-width: 1400px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 20px;
   background-color: #f8fafc;
@@ -1237,7 +1237,7 @@ watch(() => route.params.id, async (newId) => {
 .producto-tabs {
   background: white;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1);
   overflow: hidden;
   margin-bottom: 40px;
 }
