@@ -298,11 +298,11 @@ onUnmounted(() => {
               </p>
             </div>
             <div class="social-links">
-              <a href="#" class="social-link instagram">
+              <a href="https://www.instagram.com/@rugs.903/" class="social-link instagram">
                 <span class="social-icon">📷</span>
                 <span class="social-text">@rugs903</span>
               </a>
-              <a href="#" class="social-link tiktok">
+              <a href="https://www.tiktok.com/@rugs.903" class="social-link tiktok">
                 <span class="social-icon">🎵</span>
                 <span class="social-text">@rugs903</span>
               </a>
@@ -532,7 +532,7 @@ onUnmounted(() => {
             Crea la alfombra perfecta para tu hogar con nuestro servicio de diseño personalizado
           </p>
           <div class="cta-buttons">
-            <router-link to="/personalizar" class="btn-cta-primary">
+            <router-link to="/personalizado" class="btn-cta-primary">
               Diseñar mi alfombra
             </router-link>
             <router-link to="/tienda" class="btn-cta-secondary">
