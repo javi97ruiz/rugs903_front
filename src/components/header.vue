@@ -53,7 +53,7 @@
               <router-link to="/admin/usuarios" @click="cerrarDropdown">Lista de usuarios</router-link>
             </li>
             <li v-if="auth.rol === 'admin'">
-              <router-link to="/admin/clientes" @click="cerrarDropdown">Clientes</router-link>
+              <router-link to="/admin/clientes" @click="cerrarDropdown">Lista de clientes</router-link>
             </li>
             <li v-if="auth.rol === 'admin'">
               <router-link to="/admin/pedidos" @click="cerrarDropdown">Lista de pedidos</router-link>
