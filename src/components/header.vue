@@ -80,7 +80,6 @@
           </router-link>
         </div>
       </div>
-    </div>
   </header>
 </template>
 
