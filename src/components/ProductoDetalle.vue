@@ -96,13 +96,6 @@
             {{ producto.description }}
           </div>
 
-          <div class="producto-disponibilidad" :class="{ 'en-stock': isInStock, 'sin-stock': !isInStock }">
-            <span class="disponibilidad-icon">{{ isInStock ? '✓' : '✕' }}</span>
-            <span class="disponibilidad-text">
-              {{ isInStock ? `${producto.stock} unidades disponibles` : 'Agotado' }}
-            </span>
-          </div>
-
           <div class="producto-acciones">
             <div class="cantidad-selector">
               <button
