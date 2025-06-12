@@ -430,7 +430,6 @@ watch(() => route.params.id, async (newId) => {
               <button
                   @click="comprarAhora"
                   class="btn-comprar"
-                  class="btn-comprar"
                   :disabled="!isInStock"
               >
                 <span class="btn-icon">⚡</span>
