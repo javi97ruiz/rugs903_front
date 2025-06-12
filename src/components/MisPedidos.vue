@@ -177,7 +177,7 @@
                   class="item-card"
               >
                 <div class="item-image">
-                  <img :src="linea.producto?.imagen || '/placeholder.svg?height=80&width=80'" :alt="linea.productName" />
+                  <img :src="linea.productImage || '/placeholder.svg?height=80&width=80'" :alt="linea.productName" />
                 </div>
                 <div class="item-info">
                   <h5 class="item-name">{{ linea.productName }}</h5>
@@ -400,7 +400,8 @@ function getEstadoTexto(estado) {
     procesando: 'Procesando',
     enviado: 'Enviado',
     entregado: 'Entregado',
-    cancelado: 'Cancelado'
+    cancelado: 'Cancelado',
+    pagado: 'Pagado'
   }
   return textos[estado] || 'pendiente'
 }
@@ -459,7 +460,7 @@ async function reordenar(pedido) {
           id: linea.productId,
           nombre: linea.productName,
           precio: linea.precioUnitario,
-          imagen: linea.producto?.imagen || '/placeholder.svg?height=80&width=80',
+          imagen: linea.productImage || '/placeholder.svg?height=80&width=80',
           cantidad: linea.cantidad
         })
       }
