@@ -8,7 +8,6 @@ const routes = [
     { path: '/tiendaAdmin', component: () => import('@/components/tiendaAdmin.vue') },
     { path: '/registro', component: () => import('@/components/SignupForm.vue') },
     { path: '/login', component: () => import('@/components/LoginForm.vue') },
-    { path: '/contacto', component: () => import('@/views/ContactoPage.vue'), meta: { requiresAuth: true } },
     { path: '/producto/:id', component: () => import('@/components/ProductoDetalle.vue') },
     { path: '/personalizado', component: () => import('@/components/ProductoPersonalizado.vue') },
     { path: '/admin/producto/:id', component: () => import('@/components/ProductoFijoAdmin.vue') },

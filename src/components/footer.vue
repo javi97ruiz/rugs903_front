@@ -1,58 +1,50 @@
 <template>
   <footer class="footer">
-    <nav>
-      <ul>
-        <!-- Contenedor para logo y redes a la izquierda -->
-        <li class="left-section">
-          <img src="@/assets/images.jpeg" alt="Logo" class="logo" />
-          <div class="social-icons">
-            <a href="https://www.tiktok.com/@rugs.903">
-              <img src="@/assets/tik-tok (1).png" alt="TikTok" class="tiktok-icon" />
-            </a>
-            <a href="https://www.instagram.com/rugs.903/">
-              <img src="@/assets/instagram (2).png" alt="Instagram" class="instagram-icon" />
-            </a>
-          </div>
-        </li>
+    <div class="footer-container">
+      <!-- Contenedor para logo y redes a la izquierda -->
+      <div class="left-section">
+        <img src="@/assets/images.jpeg" alt="Logo" class="logo" />
+        <div class="social-icons">
+          <a href="https://www.tiktok.com/@rugs.903" target="_blank" rel="noopener noreferrer">
+            <img src="@/assets/tik-tok (1).png" alt="TikTok" class="tiktok-icon" />
+          </a>
+          <a href="https://www.instagram.com/rugs.903/" target="_blank" rel="noopener noreferrer">
+            <img src="@/assets/instagram (2).png" alt="Instagram" class="instagram-icon" />
+          </a>
+        </div>
+      </div>
 
-        <!-- Frase de marketing centrada -->
-        <li class="marketing-text">
-          <p>Esta es una frase para el marketing</p>
-        </li>
+      <!-- Frase de marketing centrada -->
+      <div class="marketing-text">
+        <p>Esta es una frase para el marketing</p>
+      </div>
 
-        <!-- Privacidad y Términos a la derecha -->
-        <li class="legal">
-          <p>Privacidad</p>
-          <p>Términos y Condiciones</p>
-        </li>
-      </ul>
-    </nav>
+      <!-- Privacidad y Términos a la derecha -->
+      <div class="legal">
+        <p>Privacidad</p>
+        <p>Términos y Condiciones</p>
+      </div>
+    </div>
   </footer>
 </template>
 
-
-<style>
+<style scoped>
 .footer {
-  position: sticky;
-  width: 100vw;
-  margin-left: calc(-50vw + 50% ); /* Corrige el desplazamiento lateral */
+  width: 100%;
   background-color: #282828;
   color: white;
-  padding: 10px 20px;
-  box-sizing: border-box;
-  z-index: 10;
+  padding: 15px 0;
+  margin-top: auto; /* Esto es clave para que se quede al fondo */
 }
 
-
-
-nav ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.footer-container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
   display: flex;
-  justify-content: space-between; /* Distribuye los elementos */
+  justify-content: space-between;
   align-items: center;
-  width: 100%;
+  flex-wrap: wrap;
 }
 
 /* Agrupa el logo y redes en la izquierda */
@@ -66,6 +58,7 @@ nav ul {
 .logo {
   width: 65px;
   height: 65px;
+  object-fit: contain;
 }
 
 /* Redes sociales en columna */
@@ -75,8 +68,13 @@ nav ul {
   gap: 5px;
 }
 
-.social-icons img {
+.social-icons a {
   display: block;
+  transition: transform 0.2s ease;
+}
+
+.social-icons a:hover {
+  transform: scale(1.1);
 }
 
 .tiktok-icon {
@@ -95,6 +93,7 @@ nav ul {
   text-align: center;
   font-size: 16px;
   font-weight: bold;
+  padding: 0 20px;
 }
 
 /* Privacidad y Términos a la derecha */
@@ -107,29 +106,46 @@ nav ul {
 .legal p {
   margin: 2px 0;
   cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.legal p:hover {
+  color: #ccc;
 }
 
 /* Responsive: En pantallas pequeñas, apilamos los elementos */
 @media (max-width: 768px) {
-
-  .footer{
-    position: sticky;
-  }
-
-  nav ul {
+  .footer-container {
     flex-direction: column;
-    align-items: center;
-    text-align: center;
+    gap: 20px;
   }
 
   .left-section {
-    flex-direction: column;
-    align-items: center;
+    flex-direction: row; /* Mantener horizontal en móvil */
+    justify-content: center;
+    width: 100%;
+  }
+
+  .marketing-text {
+    order: 3; /* Cambiar orden para móvil */
+    width: 100%;
   }
 
   .legal {
+    order: 2; /* Cambiar orden para móvil */
     align-items: center;
+    width: 100%;
   }
 }
 
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .left-section {
+    flex-direction: column; /* Apilar en vertical en pantallas muy pequeñas */
+  }
+
+  .footer {
+    padding: 20px 0;
+  }
+}
 </style>

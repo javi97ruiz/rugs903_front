@@ -4,14 +4,14 @@
       <div class="spinner"></div>
     </div>
 
-    <div v-else>
+    <div v-else class="app-container">
       <Header />
       <div class="main-content">
         <router-view />
         <DevLoginPanel />
         <Notificacion />
       </div>
-      <Footer />
+      <Footer class="footer" />
     </div>
   </div>
 </template>
@@ -26,43 +26,55 @@ import { useLoadingStore } from '@/stores/loading';
 
 const loadingStore = useLoadingStore();
 const initialLoad = ref(true);
+const showLoader = ref(true); // Initialize showLoader to true
 
-// loader inicial (html + css + imágenes)
 onMounted(() => {
+  // loader inicial (html + css + imágenes)
   window.addEventListener('load', () => {
     initialLoad.value = false;
+    showLoader.value = false; // Set showLoader to false after initial load
   });
 });
 
 // showLoader = inicial o navegación
-const showLoader = computed(() => initialLoad.value || loadingStore.isLoading);
+// const showLoader = computed(() => initialLoad.value || loadingStore.isLoading);
 </script>
 
 <style>
 html, body {
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  height: 100%;
   width: 100%;
+  overflow-x: hidden;
 }
 
 #app {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+}
+
+.app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  position: relative;
-  overflow: visible;
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0;
 }
 
 .main-content {
-  flex-grow: 1;
+  flex: 1 0 auto; /* Esto es clave para que el contenido empuje el footer */
   padding-top: 80px;
-  padding-bottom: 10px;
+  padding-bottom: 20px;
+  width: 100%;
   box-sizing: border-box;
 }
 
-body {
-  overflow-x: hidden;
+.footer {
+  flex-shrink: 0; /* Evita que el footer se encoja */
+  width: 100%;
 }
 
 /* Loader global */
@@ -92,5 +104,40 @@ body {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+/* Responsive breakpoints */
+@media (max-width: 576px) {
+  .app-container {
+    padding: 0 0.5rem;
+  }
+
+  .main-content {
+    padding-top: 60px; /* Header más pequeño en móviles */
+  }
+}
+
+@media (min-width: 576px) and (max-width: 768px) {
+  .app-container {
+    padding: 0 1rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+  .app-container {
+    padding: 0 1.5rem;
+  }
+}
+
+@media (min-width: 992px) {
+  .app-container {
+    padding: 0 2rem;
+  }
+}
+
+@media (min-width: 1200px) {
+  .app-container {
+    padding: 0 3rem;
+  }
 }
 </style>
