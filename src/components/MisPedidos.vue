@@ -388,7 +388,8 @@ function getEstadoIcon(estado) {
     procesando: '⚙️',
     enviado: '🚚',
     entregado: '✅',
-    cancelado: '❌'
+    cancelado: '❌',
+    pagado: '💳'
   }
   return iconos[estado] || '❓'
 }
