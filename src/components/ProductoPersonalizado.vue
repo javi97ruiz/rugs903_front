@@ -111,11 +111,16 @@
               <button
                   @click="crearProducto"
                   class="btn-create"
-                  :disabled="!canCreate"
+                  :disabled="!canCreate || isLoading"
               >
-                <span class="btn-icon">✨</span>
-                Crear y añadir al carrito
+                <template v-if="isLoading">
+                  <span class="btn-icon">⏳</span> Creando producto...
+                </template>
+                <template v-else>
+                  <span class="btn-icon">✨</span> Crear y añadir al carrito
+                </template>
               </button>
+
 
               <div v-if="!canCreate" class="validation-message">
                 <span class="validation-icon">ℹ️</span>
@@ -161,6 +166,7 @@ import { useRouter } from 'vue-router';
 const notificacion = useNotificacionStore();
 const carrito = useCarritoStore();
 const router = useRouter();
+const isLoading = ref(false);
 
 const imagenPreview = ref(null);
 const imagenFile = ref(null);
@@ -209,9 +215,11 @@ function handleImageUpload(event) {
 
 async function crearProducto() {
   if (!canCreate.value) {
-    notificacion.mostrar('Completa todos los campos y sube una imagen ���️', 3000, 'roja');
+    notificacion.mostrar('Completa todos los campos y sube una imagen 🖼️', 3000, 'roja');
     return;
   }
+
+  isLoading.value = true; // empieza la carga
 
   try {
     const response = await api.post('/custom-products', {
@@ -234,12 +242,15 @@ async function crearProducto() {
     });
 
     // Redirigir a tienda
-    router.push('/carrito');
+    await router.push('/tienda');
   } catch (err) {
     console.error(err);
     notificacion.mostrar('Error al crear producto personalizado ❌', 3000, 'roja');
+  } finally {
+    isLoading.value = false; // termina la carga
   }
 }
+
 </script>
 
 <style scoped>
