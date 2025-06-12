@@ -3,6 +3,9 @@ import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useCarritoStore } from '@/stores/carrito';
 import { useNotificacionStore } from '@/stores/notificacion';
+import imagenBrand from '@/assets/simpson.jpg'
+import imagenBrand2 from '@/assets/65f73fd5f2d5e1.63535676.jpg'
+import imagenBrand3 from '@/assets/shopping.webp'
 
 const router = useRouter();
 const carrito = useCarritoStore();
@@ -21,7 +24,7 @@ const heroSlides = ref([
     title: "Alfombras Artesanales Únicas",
     subtitle: "Creadas con técnica de tufting por un joven emprendedor de Getafe",
     description: "Cada alfombra es una obra de arte personalizada que transforma tu espacio",
-    image: "/placeholder.svg?height=600&width=800",
+    image: imagenBrand,
     cta: "Explorar Colección",
     ctaLink: "/tienda"
   },
@@ -30,7 +33,7 @@ const heroSlides = ref([
     title: "Diseños Personalizados",
     subtitle: "Tu imaginación, nuestra técnica",
     description: "Creamos la alfombra perfecta según tus gustos y necesidades específicas",
-    image: "/placeholder.svg?height=600&width=800",
+    image: imagenBrand2,
     cta: "Personalizar Ahora",
     ctaLink: "/personalizar"
   },
@@ -39,7 +42,7 @@ const heroSlides = ref([
     title: "Calidad Artesanal",
     subtitle: "Hecho a mano con pasión y dedicación",
     description: "Utilizamos materiales premium y técnicas tradicionales de tufting",
-    image: "/placeholder.svg?height=600&width=800",
+    image: imagenBrand3,
     cta: "Ver Proceso",
     ctaLink: "/proceso"
   }
@@ -51,21 +54,21 @@ const featuredProducts = ref([
     id: 1,
     name: "Alfombra Geométrica Moderna",
     price: 89.99,
-    image: "/placeholder.svg?height=300&width=300",
+    image: imagenBrand,
     badge: "Más Vendida"
   },
   {
     id: 2,
     name: "Alfombra Floral Vintage",
     price: 124.99,
-    image: "/placeholder.svg?height=300&width=300",
+    image: imagenBrand2,
     badge: "Nueva"
   },
   {
     id: 3,
     name: "Alfombra Minimalista",
     price: 79.99,
-    image: "/placeholder.svg?height=300&width=300",
+    image: imagenBrand3,
     badge: "Oferta"
   }
 ]);
@@ -306,7 +309,7 @@ onUnmounted(() => {
             </div>
           </div>
           <div class="about-image">
-            <img src="/placeholder.svg?height=400&width=500" alt="Proceso de tufting" class="process-image" />
+            <img src=@/assets/images.jpeg alt="Proceso de tufting" class="process-image" />
             <div class="image-badge">
               <span class="badge-icon">✨</span>
               <span class="badge-text">Hecho en Getafe</span>
@@ -392,7 +395,7 @@ onUnmounted(() => {
       <div class="container">
         <div class="process-content">
           <div class="process-image-container">
-            <img src="/placeholder.svg?height=500&width=600" alt="Proceso artesanal" class="process-main-image" />
+            <img src="@/assets/brand.jpeg" alt="Proceso artesanal" class="process-main-image" />
             <div class="process-video-overlay">
               <button class="play-button">
                 <span class="play-icon">▶</span>
