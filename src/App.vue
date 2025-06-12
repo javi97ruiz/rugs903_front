@@ -7,11 +7,15 @@
     <div v-else class="app-container">
       <Header />
       <div class="main-content">
-        <router-view />
-        <DevLoginPanel />
-        <Notificacion />
+        <!-- CAMBIO: Contenedor interno para el contenido principal -->
+        <div class="content-wrapper">
+          <router-view />
+          <DevLoginPanel />
+          <Notificacion />
+        </div>
       </div>
-      <Footer class="footer" />
+      <!-- CAMBIO: Footer fuera del contenedor limitado -->
+      <Footer />
     </div>
   </div>
 </template>
@@ -23,21 +27,19 @@ import Footer from './components/footer.vue';
 import Notificacion from '@/components/Notificacion.vue';
 import DevLoginPanel from '@/components/DevLoginPanel.vue';
 import { useLoadingStore } from '@/stores/loading';
+import { useRoute } from 'vue-router';
 
 const loadingStore = useLoadingStore();
 const initialLoad = ref(true);
-const showLoader = ref(true); // Initialize showLoader to true
+const showLoader = ref(true);
+const route = useRoute();
 
 onMounted(() => {
-  // loader inicial (html + css + imágenes)
   window.addEventListener('load', () => {
     initialLoad.value = false;
-    showLoader.value = false; // Set showLoader to false after initial load
+    showLoader.value = false;
   });
 });
-
-// showLoader = inicial o navegación
-// const showLoader = computed(() => initialLoad.value || loadingStore.isLoading);
 </script>
 
 <style>
@@ -55,26 +57,39 @@ html, body {
   position: relative;
 }
 
+/* CAMBIO: Quitar max-width del contenedor principal */
 .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  max-width: 1280px;
-  margin: 0 auto;
+  width: 100%; /* Cambio: de max-width a width 100% */
+  margin: 0;
   padding: 0;
 }
 
+/* CAMBIO: main-content sin limitación de ancho */
 .main-content {
-  flex: 1 0 auto; /* Esto es clave para que el contenido empuje el footer */
+  flex: 1 0 auto;
   padding-top: 80px;
   padding-bottom: 20px;
   width: 100%;
   box-sizing: border-box;
 }
 
-.footer {
-  flex-shrink: 0; /* Evita que el footer se encoja */
+/* NUEVO: Contenedor interno para centrar el contenido */
+.content-wrapper {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 20px;
   width: 100%;
+  box-sizing: border-box;
+}
+
+/* Footer sin limitaciones */
+.footer {
+  flex-shrink: 0;
+  width: 100%;
+  margin-top: auto;
 }
 
 /* Loader global */
@@ -106,38 +121,38 @@ html, body {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive breakpoints */
+/* Responsive breakpoints para el contenido */
 @media (max-width: 576px) {
-  .app-container {
-    padding: 0 0.5rem;
+  .content-wrapper {
+    padding: 0 15px;
   }
 
   .main-content {
-    padding-top: 60px; /* Header más pequeño en móviles */
+    padding-top: 60px;
   }
 }
 
 @media (min-width: 576px) and (max-width: 768px) {
-  .app-container {
-    padding: 0 1rem;
+  .content-wrapper {
+    padding: 0 20px;
   }
 }
 
 @media (min-width: 768px) and (max-width: 992px) {
-  .app-container {
-    padding: 0 1.5rem;
+  .content-wrapper {
+    padding: 0 30px;
   }
 }
 
 @media (min-width: 992px) {
-  .app-container {
-    padding: 0 2rem;
+  .content-wrapper {
+    padding: 0 40px;
   }
 }
 
 @media (min-width: 1200px) {
-  .app-container {
-    padding: 0 3rem;
+  .content-wrapper {
+    padding: 0 60px;
   }
 }
 </style>

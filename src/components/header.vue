@@ -43,29 +43,32 @@
             <span class="perfil-arrow">{{ mostrarMenu ? '▲' : '▼' }}</span>
           </div>
 
-          <ul v-if="mostrarMenu" class="dropdown-menu">
-            <li v-if="auth.rol === 'user'">
-              <router-link to="/perfil" @click="cerrarDropdown">Mi perfil</router-link>
-            </li>
-            <li v-if="auth.rol === 'user'">
-              <router-link to="/pedidos" @click="cerrarDropdown">Mis pedidos</router-link>
-            </li>
-            <li v-if="auth.rol === 'admin'">
-              <router-link to="/admin/usuarios" @click="cerrarDropdown">Lista de usuarios</router-link>
-            </li>
-            <li v-if="auth.rol === 'admin'">
-              <router-link to="/admin/clientes" @click="cerrarDropdown">Clientes</router-link>
-            </li>
-            <li v-if="auth.rol === 'admin'">
-              <router-link to="/admin/pedidos" @click="cerrarDropdown">Lista de pedidos</router-link>
-            </li>
-            <li v-if="auth.rol === 'admin'">
-              <router-link to="/admin/custom-products" @click="cerrarDropdown">Productos personalizados</router-link>
-            </li>
-            <li>
-              <button @click="handleLogout" class="logout-btn">Cerrar sesión</button>
-            </li>
-          </ul>
+          <!-- CAMBIO: Mejorar el dropdown con mejor z-index y animación -->
+          <transition name="dropdown">
+            <ul v-if="mostrarMenu" class="dropdown-menu">
+              <li v-if="auth.rol === 'user'">
+                <router-link to="/perfil" @click="cerrarDropdown">Mi perfil</router-link>
+              </li>
+              <li v-if="auth.rol === 'user'">
+                <router-link to="/pedidos" @click="cerrarDropdown">Mis pedidos</router-link>
+              </li>
+              <li v-if="auth.rol === 'admin'">
+                <router-link to="/admin/usuarios" @click="cerrarDropdown">Lista de usuarios</router-link>
+              </li>
+              <li v-if="auth.rol === 'admin'">
+                <router-link to="/admin/clientes" @click="cerrarDropdown">Clientes</router-link>
+              </li>
+              <li v-if="auth.rol === 'admin'">
+                <router-link to="/admin/pedidos" @click="cerrarDropdown">Lista de pedidos</router-link>
+              </li>
+              <li v-if="auth.rol === 'admin'">
+                <router-link to="/admin/custom-products" @click="cerrarDropdown">Productos personalizados</router-link>
+              </li>
+              <li>
+                <button @click="handleLogout" class="logout-btn">Cerrar sesión</button>
+              </li>
+            </ul>
+          </transition>
         </div>
 
         <!-- Login -->
@@ -86,7 +89,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useCarritoStore } from '@/stores/carrito';
 import { useClickOutside } from '@/composables/useClickOutside';
@@ -248,6 +251,7 @@ useClickOutside(dropdownRef, () => {
   background-color: #555;
 }
 
+/* CAMBIOS CLAVE PARA EL DROPDOWN */
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -256,11 +260,12 @@ useClickOutside(dropdownRef, () => {
   color: #333;
   border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
   list-style: none;
   padding: 8px 0;
-  z-index: 9999;
+  z-index: 10000; /* Aumentar z-index */
   min-width: 200px;
+  overflow: hidden; /* Para las animaciones */
 }
 
 .dropdown-menu li {
@@ -287,6 +292,28 @@ useClickOutside(dropdownRef, () => {
 .dropdown-menu .logout-btn:hover {
   background-color: #f0f0f0;
   color: #4CAF50;
+}
+
+/* ANIMACIONES PARA EL DROPDOWN */
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: all 0.2s ease;
+}
+
+.dropdown-enter-from {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateY(-10px) scale(0.95);
+}
+
+.dropdown-enter-to,
+.dropdown-leave-from {
+  opacity: 1;
+  transform: translateY(0) scale(1);
 }
 
 /* Login */
@@ -368,6 +395,7 @@ useClickOutside(dropdownRef, () => {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
+    z-index: 999; /* Asegurar que esté debajo del dropdown */
   }
 
   .main-nav.mobile-open {

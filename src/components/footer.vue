@@ -30,11 +30,12 @@
 
 <style scoped>
 .footer {
+  /* SIMPLIFICADO: Ya no necesita trucos de ancho */
   width: 100%;
   background-color: #282828;
   color: white;
   padding: 15px 0;
-  margin-top: auto; /* Esto es clave para que se quede al fondo */
+  margin-top: auto;
 }
 
 .footer-container {
@@ -47,21 +48,19 @@
   flex-wrap: wrap;
 }
 
-/* Agrupa el logo y redes en la izquierda */
+/* El resto del CSS permanece igual... */
 .left-section {
   display: flex;
   align-items: center;
   gap: 15px;
 }
 
-/* Ajuste del logo */
 .logo {
   width: 65px;
   height: 65px;
   object-fit: contain;
 }
 
-/* Redes sociales en columna */
 .social-icons {
   display: flex;
   flex-direction: column;
@@ -87,16 +86,14 @@
   height: 35px;
 }
 
-/* Centrar la frase de marketing */
 .marketing-text {
-  flex-grow: 1; /* Ocupa el espacio central */
+  flex-grow: 1;
   text-align: center;
   font-size: 16px;
   font-weight: bold;
   padding: 0 20px;
 }
 
-/* Privacidad y Términos a la derecha */
 .legal {
   display: flex;
   flex-direction: column;
@@ -113,7 +110,6 @@
   color: #ccc;
 }
 
-/* Responsive: En pantallas pequeñas, apilamos los elementos */
 @media (max-width: 768px) {
   .footer-container {
     flex-direction: column;
@@ -121,27 +117,26 @@
   }
 
   .left-section {
-    flex-direction: row; /* Mantener horizontal en móvil */
+    flex-direction: row;
     justify-content: center;
     width: 100%;
   }
 
   .marketing-text {
-    order: 3; /* Cambiar orden para móvil */
+    order: 3;
     width: 100%;
   }
 
   .legal {
-    order: 2; /* Cambiar orden para móvil */
+    order: 2;
     align-items: center;
     width: 100%;
   }
 }
 
-/* Para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .left-section {
-    flex-direction: column; /* Apilar en vertical en pantallas muy pequeñas */
+    flex-direction: column;
   }
 
   .footer {
