@@ -364,7 +364,7 @@ const pedidosFiltrados = computed(() => {
 
 // Functions
 function getPedidosByEstado(estado) {
-  return pedidos.value.filter(pedido => pedido.estado === estado)
+  return pedidos.value.filter(pedido => pedido.estado?.toLowerCase() === estado)
 }
 
 function togglePedido(id) {
@@ -391,7 +391,7 @@ function getEstadoIcon(estado) {
     cancelado: '❌',
     pagado: '💳'
   }
-  return iconos[estado] || '❓'
+  return iconos[estado?.toLowerCase()] || '❓'
 }
 
 function getEstadoTexto(estado) {
@@ -403,12 +403,12 @@ function getEstadoTexto(estado) {
     cancelado: 'Cancelado',
     pagado: 'Pagado'
   }
-  return textos[estado] || 'pendiente'
+  return textos[estado?.toLowerCase()] || 'Pendiente'
 }
 
 function isEstadoCompleto(estadoKey, estadoActual) {
   const orden = ['pendiente', 'procesando', 'enviado', 'entregado']
-  const indexActual = orden.indexOf(estadoActual)
+  const indexActual = orden.indexOf(estadoActual?.toLowerCase())
   const indexEstado = orden.indexOf(estadoKey)
   return indexEstado <= indexActual
 }
