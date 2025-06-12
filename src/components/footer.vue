@@ -14,7 +14,7 @@
       </div>
 
       <div class="marketing-text">
-        <p>Esta es una frase para el marketing</p>
+        <p>Si puedes imaginarlo podemos diseñarlo</p>
       </div>
 
       <div class="legal">
