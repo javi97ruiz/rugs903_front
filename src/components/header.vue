@@ -36,39 +36,42 @@
 
       <!-- Sección derecha: Perfil y carrito -->
       <div class="right-section">
+        <!-- DEBUG: Mostrar estado -->
+        <div style="color: white; font-size: 12px; margin-right: 10px;">
+          Debug: {{ mostrarMenu ? 'ABIERTO' : 'CERRADO' }} | Auth: {{ auth.isLoggedIn ? 'SI' : 'NO' }}
+        </div>
+
         <!-- Perfil -->
-        <div class="perfil-dropdown" v-if="auth.isLoggedIn" ref="dropdownRef">
-          <div class="perfil-trigger" @click="mostrarMenu = !mostrarMenu">
+        <div class="perfil-dropdown" v-if="auth.isLoggedIn">
+          <div class="perfil-trigger" @click="toggleDropdown">
             <span class="perfil-text">Perfil</span>
             <span class="perfil-arrow">{{ mostrarMenu ? '▲' : '▼' }}</span>
           </div>
 
-          <!-- CAMBIO: Mejorar el dropdown con mejor z-index y animación -->
-          <transition name="dropdown">
-            <ul v-if="mostrarMenu" class="dropdown-menu">
-              <li v-if="auth.rol === 'user'">
-                <router-link to="/perfil" @click="cerrarDropdown">Mi perfil</router-link>
-              </li>
-              <li v-if="auth.rol === 'user'">
-                <router-link to="/pedidos" @click="cerrarDropdown">Mis pedidos</router-link>
-              </li>
-              <li v-if="auth.rol === 'admin'">
-                <router-link to="/admin/usuarios" @click="cerrarDropdown">Lista de usuarios</router-link>
-              </li>
-              <li v-if="auth.rol === 'admin'">
-                <router-link to="/admin/clientes" @click="cerrarDropdown">Clientes</router-link>
-              </li>
-              <li v-if="auth.rol === 'admin'">
-                <router-link to="/admin/pedidos" @click="cerrarDropdown">Lista de pedidos</router-link>
-              </li>
-              <li v-if="auth.rol === 'admin'">
-                <router-link to="/admin/custom-products" @click="cerrarDropdown">Productos personalizados</router-link>
-              </li>
-              <li>
-                <button @click="handleLogout" class="logout-btn">Cerrar sesión</button>
-              </li>
-            </ul>
-          </transition>
+          <!-- FORZAR MOSTRAR para debug -->
+          <ul class="dropdown-menu" :class="{ 'force-show': mostrarMenu }">
+            <li v-if="auth.rol === 'user'">
+              <router-link to="/perfil" @click="cerrarDropdown">Mi perfil</router-link>
+            </li>
+            <li v-if="auth.rol === 'user'">
+              <router-link to="/pedidos" @click="cerrarDropdown">Mis pedidos</router-link>
+            </li>
+            <li v-if="auth.rol === 'admin'">
+              <router-link to="/admin/usuarios" @click="cerrarDropdown">Lista de usuarios</router-link>
+            </li>
+            <li v-if="auth.rol === 'admin'">
+              <router-link to="/admin/clientes" @click="cerrarDropdown">Clientes</router-link>
+            </li>
+            <li v-if="auth.rol === 'admin'">
+              <router-link to="/admin/pedidos" @click="cerrarDropdown">Lista de pedidos</router-link>
+            </li>
+            <li v-if="auth.rol === 'admin'">
+              <router-link to="/admin/custom-products" @click="cerrarDropdown">Productos personalizados</router-link>
+            </li>
+            <li>
+              <button @click="handleLogout" class="logout-btn">Cerrar sesión</button>
+            </li>
+          </ul>
         </div>
 
         <!-- Login -->
@@ -92,19 +95,25 @@
 import { ref, computed, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useCarritoStore } from '@/stores/carrito';
-import { useClickOutside } from '@/composables/useClickOutside';
 import { useRouter } from 'vue-router';
 
 const auth = useAuthStore();
 const carrito = useCarritoStore();
 const mostrarMenu = ref(false);
 const mostrarMenuMovil = ref(false);
-const dropdownRef = ref(null);
 const router = useRouter();
+const isLoggedIn = ref(auth.isLoggedIn); // Estado local para isLoggedIn
 
 const totalItems = computed(() =>
     carrito.items.reduce((acc, item) => acc + item.cantidad, 0)
 );
+
+// SIMPLIFICAR FUNCIONES
+function toggleDropdown() {
+  console.log('Toggle clicked, antes:', mostrarMenu.value);
+  mostrarMenu.value = !mostrarMenu.value;
+  console.log('Toggle clicked, después:', mostrarMenu.value);
+}
 
 function handleLogout() {
   auth.logout();
@@ -123,10 +132,11 @@ function cerrarMenuMovil() {
   mostrarMenuMovil.value = false;
 }
 
-// Cierra el menú si se hace clic fuera
-useClickOutside(dropdownRef, () => {
-  mostrarMenu.value = false;
+onMounted(() => {
+  isLoggedIn.value = auth.isLoggedIn;
 });
+
+// QUITAR useClickOutside temporalmente para debug
 </script>
 
 <style scoped>
@@ -251,7 +261,7 @@ useClickOutside(dropdownRef, () => {
   background-color: #555;
 }
 
-/* CAMBIOS CLAVE PARA EL DROPDOWN */
+/* DROPDOWN FORZADO PARA DEBUG */
 .dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -263,9 +273,17 @@ useClickOutside(dropdownRef, () => {
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
   list-style: none;
   padding: 8px 0;
-  z-index: 10000; /* Aumentar z-index */
+  z-index: 99999 !important;
   min-width: 200px;
-  overflow: hidden; /* Para las animaciones */
+  /* OCULTO POR DEFECTO */
+  display: none;
+}
+
+/* MOSTRAR CUANDO TENGA LA CLASE */
+.dropdown-menu.force-show {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .dropdown-menu li {
@@ -292,28 +310,6 @@ useClickOutside(dropdownRef, () => {
 .dropdown-menu .logout-btn:hover {
   background-color: #f0f0f0;
   color: #4CAF50;
-}
-
-/* ANIMACIONES PARA EL DROPDOWN */
-.dropdown-enter-active,
-.dropdown-leave-active {
-  transition: all 0.2s ease;
-}
-
-.dropdown-enter-from {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.95);
-}
-
-.dropdown-leave-to {
-  opacity: 0;
-  transform: translateY(-10px) scale(0.95);
-}
-
-.dropdown-enter-to,
-.dropdown-leave-from {
-  opacity: 1;
-  transform: translateY(0) scale(1);
 }
 
 /* Login */
@@ -395,7 +391,7 @@ useClickOutside(dropdownRef, () => {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    z-index: 999; /* Asegurar que esté debajo del dropdown */
+    z-index: 999;
   }
 
   .main-nav.mobile-open {

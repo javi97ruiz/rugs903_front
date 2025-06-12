@@ -1,7 +1,6 @@
 <template>
   <footer class="footer">
     <div class="footer-container">
-      <!-- Contenedor para logo y redes a la izquierda -->
       <div class="left-section">
         <img src="@/assets/images.jpeg" alt="Logo" class="logo" />
         <div class="social-icons">
@@ -14,12 +13,10 @@
         </div>
       </div>
 
-      <!-- Frase de marketing centrada -->
       <div class="marketing-text">
         <p>Esta es una frase para el marketing</p>
       </div>
 
-      <!-- Privacidad y Términos a la derecha -->
       <div class="legal">
         <p>Privacidad</p>
         <p>Términos y Condiciones</p>
@@ -30,12 +27,10 @@
 
 <style scoped>
 .footer {
-  /* SIMPLIFICADO: Ya no necesita trucos de ancho */
-  width: 100%;
+  width: 100% !important;
   background-color: #282828;
   color: white;
   padding: 15px 0;
-  margin-top: auto;
 }
 
 .footer-container {
@@ -48,7 +43,7 @@
   flex-wrap: wrap;
 }
 
-/* El resto del CSS permanece igual... */
+/* Resto del CSS igual... */
 .left-section {
   display: flex;
   align-items: center;

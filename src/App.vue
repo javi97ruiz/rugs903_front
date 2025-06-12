@@ -7,42 +7,45 @@
     <div v-else class="app-container">
       <Header />
       <div class="main-content">
-        <!-- CAMBIO: Contenedor interno para el contenido principal -->
-        <div class="content-wrapper">
-          <router-view />
-          <DevLoginPanel />
-          <Notificacion />
-        </div>
+        <router-view />
+        <DevLoginPanel />
+        <Notificacion />
       </div>
-      <!-- CAMBIO: Footer fuera del contenedor limitado -->
       <Footer />
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref } from 'vue';
+import { onMounted } from 'vue';
 import Header from './components/header.vue';
 import Footer from './components/footer.vue';
 import Notificacion from '@/components/Notificacion.vue';
 import DevLoginPanel from '@/components/DevLoginPanel.vue';
 import { useLoadingStore } from '@/stores/loading';
-import { useRoute } from 'vue-router';
 
 const loadingStore = useLoadingStore();
 const initialLoad = ref(true);
 const showLoader = ref(true);
-const route = useRoute();
 
 onMounted(() => {
-  window.addEventListener('load', () => {
+  // Simulate an initial loading period (e.g., fetching initial data)
+  setTimeout(() => {
     initialLoad.value = false;
     showLoader.value = false;
-  });
+  }, 1000); // Adjust the time as needed
 });
 </script>
 
 <style>
+/* RESET COMPLETO */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 html, body {
   margin: 0;
   padding: 0;
@@ -53,42 +56,39 @@ html, body {
 
 #app {
   min-height: 100vh;
-  width: 100%;
+  width: 100vw !important; /* FORZAR ANCHO COMPLETO */
   position: relative;
 }
 
-/* CAMBIO: Quitar max-width del contenedor principal */
+/* CONTENEDOR PRINCIPAL SIN LIMITACIONES */
 .app-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  width: 100%; /* Cambio: de max-width a width 100% */
+  width: 100vw !important; /* FORZAR ANCHO COMPLETO */
   margin: 0;
   padding: 0;
 }
 
-/* CAMBIO: main-content sin limitación de ancho */
+/* CONTENIDO PRINCIPAL */
 .main-content {
   flex: 1 0 auto;
   padding-top: 80px;
   padding-bottom: 20px;
   width: 100%;
   box-sizing: border-box;
-}
-
-/* NUEVO: Contenedor interno para centrar el contenido */
-.content-wrapper {
+  /* CENTRAR CONTENIDO INTERNO */
   max-width: 1280px;
   margin: 0 auto;
-  padding: 0 20px;
-  width: 100%;
-  box-sizing: border-box;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
-/* Footer sin limitaciones */
-.footer {
+/* FOOTER SIN LIMITACIONES */
+footer {
   flex-shrink: 0;
-  width: 100%;
+  width: 100vw !important; /* FORZAR ANCHO COMPLETO */
+  margin-left: calc(-50vw + 50%) !important; /* CENTRAR Y EXPANDIR */
   margin-top: auto;
 }
 
@@ -106,7 +106,6 @@ html, body {
   z-index: 99999;
 }
 
-/* Spinner animado */
 .spinner {
   border: 12px solid #f3f3f3;
   border-top: 12px solid #3498db;
@@ -121,38 +120,12 @@ html, body {
   100% { transform: rotate(360deg); }
 }
 
-/* Responsive breakpoints para el contenido */
+/* Responsive */
 @media (max-width: 576px) {
-  .content-wrapper {
-    padding: 0 15px;
-  }
-
   .main-content {
     padding-top: 60px;
-  }
-}
-
-@media (min-width: 576px) and (max-width: 768px) {
-  .content-wrapper {
-    padding: 0 20px;
-  }
-}
-
-@media (min-width: 768px) and (max-width: 992px) {
-  .content-wrapper {
-    padding: 0 30px;
-  }
-}
-
-@media (min-width: 992px) {
-  .content-wrapper {
-    padding: 0 40px;
-  }
-}
-
-@media (min-width: 1200px) {
-  .content-wrapper {
-    padding: 0 60px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
 </style>
