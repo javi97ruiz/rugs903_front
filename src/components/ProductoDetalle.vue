@@ -113,7 +113,6 @@
               <button
                   @click="incrementarCantidad"
                   class="btn-cantidad"
-                  :disabled="cantidad >= producto.stock"
               >+</button>
             </div>
 
@@ -121,7 +120,7 @@
               <button
                   @click="addAlCarrito"
                   class="btn-carrito"
-                  :disabled="!isInStock"
+
               >
                 <span class="btn-icon cart-icon">🛒</span>
                 Añadir al carrito
@@ -130,7 +129,6 @@
               <button
                   @click="comprarAhora"
                   class="btn-comprar"
-                  :disabled="!isInStock"
               >
                 <span class="btn-icon">⚡</span>
                 Comprar ahora
@@ -428,9 +426,6 @@ const notificacion = useNotificacionStore();
 const auth = useAuthStore();
 
 // Computed properties
-const isInStock = computed(() => {
-  return producto.value?.stock > 0;
-});
 
 const averageRating = computed(() => {
   if (!reviews.value.length) return 0;
