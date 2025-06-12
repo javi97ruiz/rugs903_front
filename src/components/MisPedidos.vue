@@ -187,7 +187,7 @@
                   </div>
                 </div>
                 <div class="item-total">
-                  {{ formatPrecio(linea.total*1.21) }}
+                  {{ formatPrecio(linea.total) }}
                 </div>
               </div>
             </div>
@@ -243,7 +243,7 @@
               </div>
               <div class="summary-row summary-total">
                 <span class="summary-label">Total:</span>
-                <span class="summary-value">{{ formatPrecio(pedido.totalPedido) }}</span>
+                <span class="summary-value">{{ formatPrecio(pedido.totalPedido*1.21) }}</span>
               </div>
             </div>
           </div>
