@@ -177,7 +177,7 @@
                   class="item-card"
               >
                 <div class="item-image">
-                  <img :src="linea.image || '/placeholder.svg?height=80&width=80'" :alt="linea.productName" />
+                  <img :src="linea.producto?.imagen || '/placeholder.svg?height=80&width=80'" :alt="linea.productName" />
                 </div>
                 <div class="item-info">
                   <h5 class="item-name">{{ linea.productName }}</h5>
@@ -187,7 +187,7 @@
                   </div>
                 </div>
                 <div class="item-total">
-                  {{ formatPrecio(linea.total) }}
+                  {{ formatPrecio(linea.total*1.21) }}
                 </div>
               </div>
             </div>
@@ -401,7 +401,7 @@ function getEstadoTexto(estado) {
     entregado: 'Entregado',
     cancelado: 'Cancelado'
   }
-  return textos[estado] || 'Desconocido'
+  return textos[estado] || 'Pendiente'
 }
 
 function isEstadoCompleto(estadoKey, estadoActual) {
@@ -458,7 +458,7 @@ async function reordenar(pedido) {
           id: linea.productId,
           nombre: linea.productName,
           precio: linea.precioUnitario,
-          imagen: linea.productImage || '/placeholder.svg?height=80&width=80',
+          imagen: linea.producto?.imagen || '/placeholder.svg?height=80&width=80',
           cantidad: linea.cantidad
         })
       }
