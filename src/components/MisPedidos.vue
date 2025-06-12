@@ -177,7 +177,7 @@
                   class="item-card"
               >
                 <div class="item-image">
-                  <img :src="linea.productImage || '/placeholder.svg?height=80&width=80'" :alt="linea.productName" />
+                  <img :src="linea.image || '/placeholder.svg?height=80&width=80'" :alt="linea.productName" />
                 </div>
                 <div class="item-info">
                   <h5 class="item-name">{{ linea.productName }}</h5>
