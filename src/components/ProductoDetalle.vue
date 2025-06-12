@@ -98,11 +98,6 @@
 
           <div class="producto-acciones">
             <div class="cantidad-selector">
-              <button
-                  @click="decrementarCantidad"
-                  class="btn-cantidad"
-                  :disabled="cantidad <= 1"
-              >−</button>
               <input
                   type="number"
                   v-model.number="cantidad"
@@ -110,10 +105,6 @@
                   :max="producto.stock"
                   class="input-cantidad"
               />
-              <button
-                  @click="incrementarCantidad"
-                  class="btn-cantidad"
-              >+</button>
             </div>
 
             <div class="botones-compra">
